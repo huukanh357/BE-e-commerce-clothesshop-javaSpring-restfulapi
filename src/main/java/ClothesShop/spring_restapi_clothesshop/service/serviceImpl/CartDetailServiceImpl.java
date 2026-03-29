@@ -1,0 +1,105 @@
+package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
+
+import ClothesShop.spring_restapi_clothesshop.dto.cartDetail.CartDetailCreateRequest;
+import ClothesShop.spring_restapi_clothesshop.dto.cartDetail.CartDetailResponse;
+import ClothesShop.spring_restapi_clothesshop.dto.cartDetail.CartDetailUpdateRequest;
+import ClothesShop.spring_restapi_clothesshop.exception.DuplicateResourceException;
+import ClothesShop.spring_restapi_clothesshop.exception.ResourceNotFoundException;
+import ClothesShop.spring_restapi_clothesshop.model.Cart;
+import ClothesShop.spring_restapi_clothesshop.model.CartDetail;
+import ClothesShop.spring_restapi_clothesshop.model.ProductDetail;
+import ClothesShop.spring_restapi_clothesshop.repository.CartDetailRepository;
+import ClothesShop.spring_restapi_clothesshop.repository.CartRepository;
+import ClothesShop.spring_restapi_clothesshop.repository.ProductDetailRepository;
+import ClothesShop.spring_restapi_clothesshop.service.CartDetailService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional
+public class CartDetailServiceImpl implements CartDetailService {
+
+    private final CartDetailRepository cartDetailRepository;
+    private final CartRepository cartRepository;
+    private final ProductDetailRepository productDetailRepository;
+
+    public CartDetailServiceImpl(
+            CartDetailRepository cartDetailRepository,
+            CartRepository cartRepository,
+            ProductDetailRepository productDetailRepository) {
+        this.cartDetailRepository = cartDetailRepository;
+        this.cartRepository = cartRepository;
+        this.productDetailRepository = productDetailRepository;
+    }
+
+    @Override
+    public CartDetailResponse createCartDetail(CartDetailCreateRequest request) {
+        Cart cart = cartRepository.findById(request.getCartId())
+                .orElseThrow(() -> new ResourceNotFoundException("Cart", "id", request.getCartId()));
+        ProductDetail productDetail = productDetailRepository.findById(request.getProductDetailId())
+                .orElseThrow(() -> new ResourceNotFoundException("ProductDetail", "id", request.getProductDetailId()));
+
+        if (cartDetailRepository.existsByCart_IdAndProductDetail_Id(request.getCartId(),
+                request.getProductDetailId())) {
+            throw new DuplicateResourceException(
+                    "CartDetail",
+                    "cartId-productDetailId",
+                    request.getCartId() + "-" + request.getProductDetailId());
+        }
+
+        CartDetail cartDetail = new CartDetail();
+        cartDetail.setCart(cart);
+        cartDetail.setProductDetail(productDetail);
+        cartDetail.setQuantity(request.getQuantity());
+
+        CartDetail savedCartDetail = cartDetailRepository.save(cartDetail);
+        return CartDetailResponse.fromEntity(savedCartDetail);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CartDetailResponse getCartDetailById(Long id) {
+        return CartDetailResponse.fromEntity(findCartDetailByIdOrThrow(id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CartDetailResponse> getAllCartDetails(Pageable pageable) {
+        return cartDetailRepository.findAll(pageable).map(CartDetailResponse::fromEntity);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CartDetailResponse> getCartDetailsByCartId(Long cartId, Pageable pageable) {
+        if (!cartRepository.existsById(cartId)) {
+            throw new ResourceNotFoundException("Cart", "id", cartId);
+        }
+        return cartDetailRepository.findByCart_Id(cartId, pageable).map(CartDetailResponse::fromEntity);
+    }
+
+    @Override
+    public CartDetailResponse updateCartDetail(Long id, CartDetailUpdateRequest request) {
+        CartDetail cartDetail = findCartDetailByIdOrThrow(id);
+
+        if (request.getQuantity() != null) {
+            cartDetail.setQuantity(request.getQuantity());
+        }
+
+        CartDetail updatedCartDetail = cartDetailRepository.save(cartDetail);
+        return CartDetailResponse.fromEntity(updatedCartDetail);
+    }
+
+    @Override
+    public void deleteCartDetail(Long id) {
+        findCartDetailByIdOrThrow(id);
+        cartDetailRepository.deleteById(id);
+    }
+
+    private CartDetail findCartDetailByIdOrThrow(Long id) {
+        return cartDetailRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("CartDetail", "id", id));
+    }
+
+}
