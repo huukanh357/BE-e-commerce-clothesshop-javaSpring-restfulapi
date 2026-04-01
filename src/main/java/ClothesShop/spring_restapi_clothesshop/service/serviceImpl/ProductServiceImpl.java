@@ -18,6 +18,8 @@ import ClothesShop.spring_restapi_clothesshop.service.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -47,6 +49,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(cacheNames = { "productById", "productByName", "productsPage", "productsByCategoryPage" }, allEntries = true)
     public ProductResponse createProduct(ProductCreateRequest request) {
         if (productRepository.existsByName(request.getName())) {
             throw new DuplicateResourceException("Product", "name", request.getName());
@@ -66,12 +69,14 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "productById", key = "#id")
     public ProductResponse getProductById(Long id) {
         return ProductResponse.fromEntity(findProductByIdOrThrow(id));
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "productByName", key = "#name")
     public ProductResponse getProductByName(String name) {
         Product product = productRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "name", name));
@@ -80,12 +85,14 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "productsPage")
     public Page<ProductResponse> getAllProducts(Pageable pageable) {
         return productRepository.findAll(pageable).map(ProductResponse::fromEntity);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "productsByCategoryPage")
     public Page<ProductResponse> getProductsByCategory(String categoryName, Pageable pageable) {
         return productRepository.findByCategoryName(categoryName, pageable).map(ProductResponse::fromEntity);
     }
@@ -103,6 +110,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(cacheNames = { "productById", "productByName", "productsPage", "productsByCategoryPage" }, allEntries = true)
     public ProductResponse updateProduct(Long id, ProductUpdateRequest request) {
         Product product = findProductByIdOrThrow(id);
 
@@ -135,6 +143,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(cacheNames = { "productById", "productByName", "productsPage", "productsByCategoryPage" }, allEntries = true)
     public ProductResponse uploadProductImages(Long id, List<MultipartFile> files) {
         if (files == null || files.isEmpty()) {
             throw new FileUploadException("Không có file được cung cấp");
@@ -157,6 +166,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(cacheNames = { "productById", "productByName", "productsPage", "productsByCategoryPage" }, allEntries = true)
     public void deleteProduct(Long id) {
         findProductByIdOrThrow(id);
         productRepository.deleteById(id);

@@ -8,6 +8,8 @@ import ClothesShop.spring_restapi_clothesshop.exception.ResourceNotFoundExceptio
 import ClothesShop.spring_restapi_clothesshop.model.Category;
 import ClothesShop.spring_restapi_clothesshop.repository.CategoryRepository;
 import ClothesShop.spring_restapi_clothesshop.service.CategoryService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @CacheEvict(cacheNames = { "categoryById", "categoryByName", "categoriesPage" }, allEntries = true)
     public CategoryResponse createCategory(CategoryCreateRequest request) {
         if (categoryRepository.existsByName(request.getName())) {
             throw new DuplicateResourceException("Category", "name", request.getName());
@@ -38,12 +41,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "categoryById", key = "#id")
     public CategoryResponse getCategoryById(Long id) {
         return CategoryResponse.fromEntity(findCategoryByIdOrThrow(id));
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "categoryByName", key = "#name")
     public CategoryResponse getCategoryByName(String name) {
         Category category = categoryRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "name", name));
@@ -52,11 +57,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "categoriesPage")
     public Page<CategoryResponse> getAllCategories(Pageable pageable) {
         return categoryRepository.findAll(pageable).map(CategoryResponse::fromEntity);
     }
 
     @Override
+    @CacheEvict(cacheNames = { "categoryById", "categoryByName", "categoriesPage" }, allEntries = true)
     public CategoryResponse updateCategory(Long id, CategoryUpdateRequest request) {
         Category category = findCategoryByIdOrThrow(id);
 
@@ -75,6 +82,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @CacheEvict(cacheNames = { "categoryById", "categoryByName", "categoriesPage" }, allEntries = true)
     public void deleteCategory(Long id) {
         findCategoryByIdOrThrow(id);
         categoryRepository.deleteById(id);
