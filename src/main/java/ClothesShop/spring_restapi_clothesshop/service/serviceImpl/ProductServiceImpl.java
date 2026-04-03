@@ -49,7 +49,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @CacheEvict(cacheNames = { "productById", "productByName", "productsPage", "productsByCategoryPage" }, allEntries = true)
+    @CacheEvict(cacheNames = { "productById", "productByName", "productsPage",
+            "productsByCategoryPage" }, allEntries = true)
     public ProductResponse createProduct(ProductCreateRequest request) {
         if (productRepository.existsByName(request.getName())) {
             throw new DuplicateResourceException("Product", "name", request.getName());
@@ -110,7 +111,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @CacheEvict(cacheNames = { "productById", "productByName", "productsPage", "productsByCategoryPage" }, allEntries = true)
+    @CacheEvict(cacheNames = { "productById", "productByName", "productsPage",
+            "productsByCategoryPage" }, allEntries = true)
     public ProductResponse updateProduct(Long id, ProductUpdateRequest request) {
         Product product = findProductByIdOrThrow(id);
 
@@ -143,7 +145,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @CacheEvict(cacheNames = { "productById", "productByName", "productsPage", "productsByCategoryPage" }, allEntries = true)
+    @CacheEvict(cacheNames = { "productById", "productByName", "productsPage",
+            "productsByCategoryPage" }, allEntries = true)
     public ProductResponse uploadProductImages(Long id, List<MultipartFile> files) {
         if (files == null || files.isEmpty()) {
             throw new FileUploadException("Không có file được cung cấp");
@@ -166,7 +169,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @CacheEvict(cacheNames = { "productById", "productByName", "productsPage", "productsByCategoryPage" }, allEntries = true)
+    @CacheEvict(cacheNames = { "productById", "productByName", "productsPage",
+            "productsByCategoryPage" }, allEntries = true)
     public void deleteProduct(Long id) {
         findProductByIdOrThrow(id);
         productRepository.deleteById(id);
