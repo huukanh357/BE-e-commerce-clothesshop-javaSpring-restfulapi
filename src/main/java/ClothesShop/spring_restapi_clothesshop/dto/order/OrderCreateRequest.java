@@ -1,13 +1,23 @@
 package ClothesShop.spring_restapi_clothesshop.dto.order;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
-
 import ClothesShop.spring_restapi_clothesshop.model.ENUM.OrderStatusEnum;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderCreateRequest {
 
     @NotNull(message = "User id không được để trống")
@@ -26,44 +36,4 @@ public class OrderCreateRequest {
     private ShippingInfoRequest shippingInfo;
 
     private OrderStatusEnum status;
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getCartId() {
-        return cartId;
-    }
-
-    public void setCartId(Long cartId) {
-        this.cartId = cartId;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public ShippingInfoRequest getShippingInfo() {
-        return shippingInfo;
-    }
-
-    public void setShippingInfo(ShippingInfoRequest shippingInfo) {
-        this.shippingInfo = shippingInfo;
-    }
-
-    public OrderStatusEnum getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatusEnum status) {
-        this.status = status;
-    }
 }

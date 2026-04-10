@@ -1,10 +1,21 @@
 package ClothesShop.spring_restapi_clothesshop.dto.orderItem;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderItemCreateRequest {
 
     @NotNull(message = "Order id không được để trống")
@@ -22,36 +33,4 @@ public class OrderItemCreateRequest {
     @NotNull(message = "Price không được để trống")
     @DecimalMin(value = "0.0", inclusive = false, message = "Price phải lớn hơn 0")
     private BigDecimal price;
-
-    public Long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
-    }
-
-    public Long getProductDetailId() {
-        return productDetailId;
-    }
-
-    public void setProductDetailId(Long productDetailId) {
-        this.productDetailId = productDetailId;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
 }

@@ -1,12 +1,22 @@
 package ClothesShop.spring_restapi_clothesshop.dto.cart;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import ClothesShop.spring_restapi_clothesshop.dto.cartDetail.CartItemResponse;
 import ClothesShop.spring_restapi_clothesshop.model.Cart;
 import ClothesShop.spring_restapi_clothesshop.model.CartDetail;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartUserResponse {
 
     private Long id;
@@ -32,25 +42,5 @@ public class CartUserResponse {
         dto.userId = userId;
         dto.items = new ArrayList<>();
         return dto;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public List<CartItemResponse> getItems() {
-        return items;
     }
 }

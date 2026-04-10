@@ -1,11 +1,22 @@
 package ClothesShop.spring_restapi_clothesshop.dto.payment;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import ClothesShop.spring_restapi_clothesshop.model.ENUM.PaymentMethodEnum;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class PaymentUserCreateRequest {
 
     @NotNull(message = "Order id không được để trống")
@@ -18,28 +29,4 @@ public class PaymentUserCreateRequest {
 
     @NotNull(message = "Method không được để trống")
     private PaymentMethodEnum method;
-
-    public Long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public PaymentMethodEnum getMethod() {
-        return method;
-    }
-
-    public void setMethod(PaymentMethodEnum method) {
-        this.method = method;
-    }
 }

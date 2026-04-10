@@ -3,14 +3,18 @@ package ClothesShop.spring_restapi_clothesshop.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * Wrapper class cho tất cả API responses.
- * Đảm bảo format nhất quán cho cả success và error cases.
+ * Wrapper class cho t?t c? API responses.
+ * ??m b?o format nh?t qu?n cho c? success v? error cases.
  *
- * @param <T> Kiểu dữ liệu của field data
+ * @param <T> Ki?u d? li?u c?a field data
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Getter
+@Setter
 public class ApiResponse<T> {
 
     // ========== FIELDS ==========
@@ -18,13 +22,13 @@ public class ApiResponse<T> {
     private int statusCode;
     private String message;
 
-    // Chỉ có khi SUCCESS
+    // Ch? c? khi SUCCESS
     private T data;
 
-    // Chỉ có khi ERROR
+    // Ch? c? khi ERROR
     private String error;
 
-    // Chỉ có khi VALIDATION ERROR (nhiều lỗi)
+    // Ch? c? khi VALIDATION ERROR (nhi?u l?i)
     private List<String> details;
 
     // ========== CONSTRUCTORS ==========
@@ -101,47 +105,5 @@ public class ApiResponse<T> {
 
     public static <T> ApiResponse<T> ofError(int statusCode, String message, String error) {
         return new ApiResponse<>(statusCode, message, error, null);
-    }
-
-    // ========== GETTERS & SETTERS ==========
-
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
-    }
-
-    public List<String> getDetails() {
-        return details;
-    }
-
-    public void setDetails(List<String> details) {
-        this.details = details;
     }
 }

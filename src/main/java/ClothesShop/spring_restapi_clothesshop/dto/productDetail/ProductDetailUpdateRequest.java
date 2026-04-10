@@ -1,8 +1,19 @@
 package ClothesShop.spring_restapi_clothesshop.dto.productDetail;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductDetailUpdateRequest {
 
     @Size(max = 20, message = "Size tối đa 20 ký tự")
@@ -13,28 +24,4 @@ public class ProductDetailUpdateRequest {
 
     @Min(value = 0, message = "Stock quantity không được âm")
     private Integer stockQuantity;
-
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public Integer getStockQuantity() {
-        return stockQuantity;
-    }
-
-    public void setStockQuantity(Integer stockQuantity) {
-        this.stockQuantity = stockQuantity;
-    }
 }

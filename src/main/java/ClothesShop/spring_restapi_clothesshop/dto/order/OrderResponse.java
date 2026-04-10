@@ -1,11 +1,20 @@
 package ClothesShop.spring_restapi_clothesshop.dto.order;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import ClothesShop.spring_restapi_clothesshop.model.Order;
 import ClothesShop.spring_restapi_clothesshop.model.ENUM.OrderStatusEnum;
-
 import java.math.BigDecimal;
 import java.time.Instant;
-
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderResponse {
 
     private Long id;
@@ -28,37 +37,5 @@ public class OrderResponse {
         dto.createdAt = order.getCreatedAt();
         dto.updatedAt = order.getUpdatedAt();
         return dto;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public Long getCartId() {
-        return cartId;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public ShippingInfoResponse getShippingInfo() {
-        return shippingInfo;
-    }
-
-    public OrderStatusEnum getStatus() {
-        return status;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
     }
 }

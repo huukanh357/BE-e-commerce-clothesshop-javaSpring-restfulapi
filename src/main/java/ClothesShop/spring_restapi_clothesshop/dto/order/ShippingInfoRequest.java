@@ -1,8 +1,19 @@
 package ClothesShop.spring_restapi_clothesshop.dto.order;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShippingInfoRequest {
 
     @NotBlank(message = "Receiver name không được để trống")
@@ -23,44 +34,4 @@ public class ShippingInfoRequest {
 
     @Size(max = 500, message = "Shipping note tối đa 500 ký tự")
     private String shippingNote;
-
-    public String getReceiverName() {
-        return receiverName;
-    }
-
-    public void setReceiverName(String receiverName) {
-        this.receiverName = receiverName;
-    }
-
-    public String getReceiverPhone() {
-        return receiverPhone;
-    }
-
-    public void setReceiverPhone(String receiverPhone) {
-        this.receiverPhone = receiverPhone;
-    }
-
-    public String getShippingAddress() {
-        return shippingAddress;
-    }
-
-    public void setShippingAddress(String shippingAddress) {
-        this.shippingAddress = shippingAddress;
-    }
-
-    public String getShippingCity() {
-        return shippingCity;
-    }
-
-    public void setShippingCity(String shippingCity) {
-        this.shippingCity = shippingCity;
-    }
-
-    public String getShippingNote() {
-        return shippingNote;
-    }
-
-    public void setShippingNote(String shippingNote) {
-        this.shippingNote = shippingNote;
-    }
 }

@@ -1,11 +1,21 @@
 package ClothesShop.spring_restapi_clothesshop.dto.payment;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import ClothesShop.spring_restapi_clothesshop.model.Payment;
 import ClothesShop.spring_restapi_clothesshop.model.ENUM.PaymentMethodEnum;
 import ClothesShop.spring_restapi_clothesshop.model.ENUM.PaymentStatusEnum;
 import java.math.BigDecimal;
 import java.time.Instant;
-
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class PaymentResponse {
 
     private Long id;
@@ -28,37 +38,5 @@ public class PaymentResponse {
         dto.createdAt = payment.getCreatedAt();
         dto.updatedAt = payment.getUpdatedAt();
         return dto;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getOrderId() {
-        return orderId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public PaymentMethodEnum getMethod() {
-        return method;
-    }
-
-    public PaymentStatusEnum getStatus() {
-        return status;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
     }
 }

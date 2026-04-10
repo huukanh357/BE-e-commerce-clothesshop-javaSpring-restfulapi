@@ -28,11 +28,6 @@ public class CartUserController {
         this.cartService = cartService;
     }
 
-    /**
-     * GET /api/me/cart
-     * Lấy giỏ hàng của user hiện tại.
-     * Trả về giỏ hàng rỗng (items = []) nếu user chưa có cart.
-     */
     @GetMapping
     public ResponseEntity<ApiResponse<CartUserResponse>> getMyCart(
             @AuthenticationPrincipal Jwt jwt) {
@@ -40,12 +35,6 @@ public class CartUserController {
         return ResponseEntity.ok(ApiResponse.success("Lấy giỏ hàng thành công", cart));
     }
 
-    /**
-     * POST /api/me/cart/items
-     * Thêm item vào giỏ hàng.
-     * Nếu chưa có cart, tự động tạo mới.
-     * Nếu productDetailId đã có trong cart, cộng dồn quantity.
-     */
     @PostMapping("/items")
     public ResponseEntity<ApiResponse<CartUserResponse>> addItem(
             @AuthenticationPrincipal Jwt jwt,
@@ -54,11 +43,6 @@ public class CartUserController {
         return ResponseEntity.ok(ApiResponse.success("Thêm sản phẩm vào giỏ hàng thành công", cart));
     }
 
-    /**
-     * PATCH /api/me/cart/items/{itemId}
-     * Cập nhật số lượng item.
-     * Nếu quantity = 0, item sẽ bị xóa khỏi giỏ hàng.
-     */
     @PatchMapping("/items/{itemId}")
     public ResponseEntity<ApiResponse<CartUserResponse>> updateItem(
             @AuthenticationPrincipal Jwt jwt,
@@ -68,10 +52,6 @@ public class CartUserController {
         return ResponseEntity.ok(ApiResponse.success("Cập nhật giỏ hàng thành công", cart));
     }
 
-    /**
-     * DELETE /api/me/cart/items/{itemId}
-     * Xóa một item khỏi giỏ hàng.
-     */
     @DeleteMapping("/items/{itemId}")
     public ResponseEntity<ApiResponse<CartUserResponse>> deleteItem(
             @AuthenticationPrincipal Jwt jwt,
@@ -80,10 +60,6 @@ public class CartUserController {
         return ResponseEntity.ok(ApiResponse.success("Xóa sản phẩm khỏi giỏ hàng thành công", cart));
     }
 
-    /**
-     * DELETE /api/me/cart/items
-     * Xóa toàn bộ items trong giỏ hàng (clear cart).
-     */
     @DeleteMapping("/items")
     public ResponseEntity<ApiResponse<CartUserResponse>> clearCart(
             @AuthenticationPrincipal Jwt jwt) {

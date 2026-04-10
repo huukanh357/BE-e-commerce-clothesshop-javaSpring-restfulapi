@@ -1,8 +1,18 @@
 package ClothesShop.spring_restapi_clothesshop.dto.category;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import ClothesShop.spring_restapi_clothesshop.model.Category;
 import java.time.Instant;
-
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategoryResponse {
 
     private Long id;
@@ -17,21 +27,5 @@ public class CategoryResponse {
         response.createdAt = category.getCreatedAt();
         response.updatedAt = category.getUpdatedAt();
         return response;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
     }
 }

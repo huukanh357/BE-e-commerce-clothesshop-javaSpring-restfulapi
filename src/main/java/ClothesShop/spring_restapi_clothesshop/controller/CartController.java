@@ -31,13 +31,6 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    // ============= Admin Endpoints: /api/carts (Quản lý tất cả giỏ hàng)
-    // =============
-
-    /**
-     * GET /api/carts
-     * Get all carts with pagination (Admin only)
-     */
     @GetMapping("/api/carts")
     public ResponseEntity<ApiResponse<ResultPaginationDTO>> getAllCarts(Pageable pageable) {
         Page<CartResponse> page = cartService.getAllCarts(pageable);
@@ -45,10 +38,6 @@ public class CartController {
         return ResponseEntity.ok(ApiResponse.success("Lấy tất cả giỏ hàng thành công", result));
     }
 
-    /**
-     * GET /api/carts/{id}
-     * Get cart by ID (Admin only)
-     */
     @GetMapping("/api/carts/{id}")
     public ResponseEntity<ApiResponse<CartResponse>> getCartById(
             @PathVariable @Positive(message = "ID phải lớn hơn 0") Long id) {
@@ -56,10 +45,6 @@ public class CartController {
         return ResponseEntity.ok(ApiResponse.success("Lấy giỏ hàng thành công", cart));
     }
 
-    /**
-     * GET /api/carts/user/{userId}
-     * Get cart by user ID (Admin only)
-     */
     @GetMapping("/api/carts/user/{userId}")
     public ResponseEntity<ApiResponse<CartResponse>> getCartByUserId(
             @PathVariable @Positive(message = "ID người dùng phải lớn hơn 0") Long userId) {
@@ -67,10 +52,6 @@ public class CartController {
         return ResponseEntity.ok(ApiResponse.success("Lấy giỏ hàng theo người dùng thành công", cart));
     }
 
-    /**
-     * POST /api/carts
-     * Create a new cart (Admin only)
-     */
     @PostMapping("/api/carts")
     public ResponseEntity<ApiResponse<CartResponse>> createCart(
             @RequestBody @Valid CartCreateRequest request) {
@@ -79,10 +60,6 @@ public class CartController {
                 .body(ApiResponse.created("Tạo giỏ hàng thành công", cart));
     }
 
-    /**
-     * PUT /api/carts/{id}
-     * Update cart (Admin only)
-     */
     @PutMapping("/api/carts/{id}")
     public ResponseEntity<ApiResponse<CartResponse>> updateCart(
             @PathVariable @Positive(message = "ID phải lớn hơn 0") Long id,
@@ -91,10 +68,6 @@ public class CartController {
         return ResponseEntity.ok(ApiResponse.success("Cập nhật giỏ hàng thành công", cart));
     }
 
-    /**
-     * DELETE /api/carts/{id}
-     * Delete cart (Admin only)
-     */
     @DeleteMapping("/api/carts/{id}")
     public ResponseEntity<Void> deleteCart(@PathVariable @Positive(message = "ID phải lớn hơn 0") Long id) {
         cartService.deleteCart(id);

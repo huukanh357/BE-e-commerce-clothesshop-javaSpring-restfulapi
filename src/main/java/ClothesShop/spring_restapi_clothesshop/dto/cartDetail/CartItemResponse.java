@@ -1,11 +1,21 @@
 package ClothesShop.spring_restapi_clothesshop.dto.cartDetail;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import ClothesShop.spring_restapi_clothesshop.model.CartDetail;
 import ClothesShop.spring_restapi_clothesshop.model.Product;
 import ClothesShop.spring_restapi_clothesshop.model.ProductDetail;
 import java.math.BigDecimal;
 import java.time.Instant;
-
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartItemResponse {
 
     private Long itemId;
@@ -39,53 +49,5 @@ public class CartItemResponse {
         dto.createdAt = cartDetail.getCreatedAt();
         dto.updatedAt = cartDetail.getUpdatedAt();
         return dto;
-    }
-
-    public Long getItemId() {
-        return itemId;
-    }
-
-    public Long getProductId() {
-        return productId;
-    }
-
-    public Long getProductDetailId() {
-        return productDetailId;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public BigDecimal getUnitPrice() {
-        return unitPrice;
-    }
-
-    public BigDecimal getTotalPrice() {
-        return totalPrice;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
     }
 }

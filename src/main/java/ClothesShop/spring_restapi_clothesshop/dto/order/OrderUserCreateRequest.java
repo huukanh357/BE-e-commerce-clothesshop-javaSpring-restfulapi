@@ -1,11 +1,22 @@
 package ClothesShop.spring_restapi_clothesshop.dto.order;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderUserCreateRequest {
 
     @Min(value = 1, message = "Cart id phải lớn hơn 0")
@@ -18,28 +29,4 @@ public class OrderUserCreateRequest {
     @NotNull(message = "Shipping info không được để trống")
     @Valid
     private ShippingInfoRequest shippingInfo;
-
-    public Long getCartId() {
-        return cartId;
-    }
-
-    public void setCartId(Long cartId) {
-        this.cartId = cartId;
-    }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public ShippingInfoRequest getShippingInfo() {
-        return shippingInfo;
-    }
-
-    public void setShippingInfo(ShippingInfoRequest shippingInfo) {
-        this.shippingInfo = shippingInfo;
-    }
 }

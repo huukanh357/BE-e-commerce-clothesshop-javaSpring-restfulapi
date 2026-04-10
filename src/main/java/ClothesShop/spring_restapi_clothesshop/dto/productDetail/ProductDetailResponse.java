@@ -1,8 +1,18 @@
 package ClothesShop.spring_restapi_clothesshop.dto.productDetail;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import ClothesShop.spring_restapi_clothesshop.model.ProductDetail;
 import java.time.Instant;
-
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductDetailResponse {
 
     private Long id;
@@ -23,33 +33,5 @@ public class ProductDetailResponse {
         dto.createdAt = productDetail.getCreatedAt();
         dto.updatedAt = productDetail.getUpdatedAt();
         return dto;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getProductId() {
-        return productId;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Integer getStockQuantity() {
-        return stockQuantity;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
     }
 }

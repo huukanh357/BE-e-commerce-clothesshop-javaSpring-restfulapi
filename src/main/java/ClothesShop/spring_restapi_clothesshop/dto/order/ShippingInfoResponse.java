@@ -1,8 +1,18 @@
 package ClothesShop.spring_restapi_clothesshop.dto.order;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import ClothesShop.spring_restapi_clothesshop.model.ShippingInfo;
 import java.time.Instant;
-
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShippingInfoResponse {
 
     private Long id;
@@ -28,37 +38,5 @@ public class ShippingInfoResponse {
         dto.createdAt = shippingInfo.getCreatedAt();
         dto.updatedAt = shippingInfo.getUpdatedAt();
         return dto;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getReceiverName() {
-        return receiverName;
-    }
-
-    public String getReceiverPhone() {
-        return receiverPhone;
-    }
-
-    public String getShippingAddress() {
-        return shippingAddress;
-    }
-
-    public String getShippingCity() {
-        return shippingCity;
-    }
-
-    public String getShippingNote() {
-        return shippingNote;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
     }
 }

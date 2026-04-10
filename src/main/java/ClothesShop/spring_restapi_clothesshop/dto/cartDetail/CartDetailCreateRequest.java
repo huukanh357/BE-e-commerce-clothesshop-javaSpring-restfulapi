@@ -1,8 +1,19 @@
 package ClothesShop.spring_restapi_clothesshop.dto.cartDetail;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartDetailCreateRequest {
 
     @NotNull(message = "Cart id không được để trống")
@@ -16,28 +27,4 @@ public class CartDetailCreateRequest {
     @NotNull(message = "Quantity không được để trống")
     @Min(value = 1, message = "Quantity phải lớn hơn 0")
     private Integer quantity;
-
-    public Long getCartId() {
-        return cartId;
-    }
-
-    public void setCartId(Long cartId) {
-        this.cartId = cartId;
-    }
-
-    public Long getProductDetailId() {
-        return productDetailId;
-    }
-
-    public void setProductDetailId(Long productDetailId) {
-        this.productDetailId = productDetailId;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
 }

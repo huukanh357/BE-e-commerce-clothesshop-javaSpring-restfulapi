@@ -1,8 +1,18 @@
 package ClothesShop.spring_restapi_clothesshop.dto.permission;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import ClothesShop.spring_restapi_clothesshop.model.Permission;
 import ClothesShop.spring_restapi_clothesshop.model.ENUM.PermissionMethodENUM;
-
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class PermissionResponse {
 
     private Long id;
@@ -19,25 +29,5 @@ public class PermissionResponse {
         dto.method = permission.getMethod();
         dto.module = permission.getModule();
         return dto;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getApiPath() {
-        return apiPath;
-    }
-
-    public PermissionMethodENUM getMethod() {
-        return method;
-    }
-
-    public String getModule() {
-        return module;
     }
 }

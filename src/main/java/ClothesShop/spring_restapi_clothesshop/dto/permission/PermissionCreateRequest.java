@@ -1,10 +1,21 @@
 package ClothesShop.spring_restapi_clothesshop.dto.permission;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import ClothesShop.spring_restapi_clothesshop.model.ENUM.PermissionMethodENUM;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class PermissionCreateRequest {
 
     @NotBlank(message = "Name không được để trống")
@@ -21,36 +32,4 @@ public class PermissionCreateRequest {
     @NotBlank(message = "Module không được để trống")
     @Size(max = 100, message = "Module tối đa 100 ký tự")
     private String module;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getApiPath() {
-        return apiPath;
-    }
-
-    public void setApiPath(String apiPath) {
-        this.apiPath = apiPath;
-    }
-
-    public PermissionMethodENUM getMethod() {
-        return method;
-    }
-
-    public void setMethod(PermissionMethodENUM method) {
-        this.method = method;
-    }
-
-    public String getModule() {
-        return module;
-    }
-
-    public void setModule(String module) {
-        this.module = module;
-    }
 }

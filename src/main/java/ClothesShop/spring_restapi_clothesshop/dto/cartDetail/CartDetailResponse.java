@@ -1,8 +1,18 @@
 package ClothesShop.spring_restapi_clothesshop.dto.cartDetail;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import ClothesShop.spring_restapi_clothesshop.model.CartDetail;
 import java.time.Instant;
-
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartDetailResponse {
 
     private Long id;
@@ -21,29 +31,5 @@ public class CartDetailResponse {
         dto.createdAt = cartDetail.getCreatedAt();
         dto.updatedAt = cartDetail.getUpdatedAt();
         return dto;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getCartId() {
-        return cartId;
-    }
-
-    public Long getProductDetailId() {
-        return productDetailId;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
     }
 }
