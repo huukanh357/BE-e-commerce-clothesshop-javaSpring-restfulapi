@@ -9,6 +9,11 @@ import ClothesShop.spring_restapi_clothesshop.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Positive;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,24 +23,15 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * REST Controller cho User.
- * Xử lý tất cả HTTP requests liên quan đến User.
- */
 @RestController
 @Validated
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class UserController {
 
-    private final UserService userService;
+    UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
-    /**
-     * GET /api/users - Lấy danh sách user (có phân trang)
-     * Query params: page, size, sort
-     */
     @GetMapping("/api/users")
     public ResponseEntity<ApiResponse<ResultPaginationDTO>> getAllUsers(Pageable pageable) {
         Page<UserResponse> userPage = userService.getAllUsers(pageable);
@@ -43,9 +39,6 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("Get all users successfully", result));
     }
 
-    /**
-     * GET /api/users/{id} - Lấy user theo ID
-     */
     @GetMapping("/api/users/{id}")
     public ResponseEntity<ApiResponse<UserResponse>> getUserById(
             @PathVariable @Positive(message = "Id phải lớn hơn 0") Long id) {
@@ -53,18 +46,12 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("Get user successfully", user));
     }
 
-    /**
-     * GET /api/users/username/{username} - Lấy user theo username
-     */
     @GetMapping("/api/users/username/{username}")
     public ResponseEntity<ApiResponse<UserResponse>> getUserByUsername(@PathVariable String username) {
         UserResponse user = userService.getUserByUsername(username);
         return ResponseEntity.ok(ApiResponse.success("Get user successfully", user));
     }
 
-    /**
-     * GET /api/users/email/{email} - Lấy user theo email
-     */
     @GetMapping("/api/users/email/{email}")
     public ResponseEntity<ApiResponse<UserResponse>> getUserByEmail(
             @PathVariable @Email(message = "Email không đúng định dạng") String email) {
@@ -72,9 +59,6 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("Get user successfully", user));
     }
 
-    /**
-     * POST /api/users - Tạo user mới
-     */
     @PostMapping("/api/users")
     public ResponseEntity<ApiResponse<UserResponse>> createUser(@RequestBody @Valid UserCreateRequest request) {
         UserResponse newUser = userService.createUser(request);
@@ -90,9 +74,6 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("Avatar uploaded successfully", updatedUser));
     }
 
-    /**
-     * PUT /api/users/{id} - Cập nhật user
-     */
     @PutMapping("/api/users/{id}")
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
             @PathVariable @Positive(message = "Id phải lớn hơn 0") Long id,
@@ -101,9 +82,6 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("User updated successfully", updatedUser));
     }
 
-    /**
-     * DELETE /api/users/{id} - Xóa user
-     */
     @DeleteMapping("/api/users/{id}")
     public ResponseEntity<Void> deleteUser(
             @PathVariable @Positive(message = "Id phải lớn hơn 0") Long id) {
@@ -111,9 +89,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * GET /api/users/check/username/{username} - Kiểm tra username đã tồn tại
-     */
     @GetMapping("/api/users/check/username/{username}")
     public ResponseEntity<ApiResponse<Boolean>> checkUsernameExists(@PathVariable String username) {
         boolean exists = userService.existsByUsername(username);
@@ -121,9 +96,6 @@ public class UserController {
                 .ok(ApiResponse.success(exists ? "Username already exists" : "Username available", exists));
     }
 
-    /**
-     * GET /api/users/check/email/{email} - Kiểm tra email đã tồn tại
-     */
     @GetMapping("/api/users/check/email/{email}")
     public ResponseEntity<ApiResponse<Boolean>> checkEmailExists(
             @PathVariable @Email(message = "Email không đúng định dạng") String email) {

@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.controller;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.ApiResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.ResultPaginationDTO;
 import ClothesShop.spring_restapi_clothesshop.dto.permission.PermissionCreateRequest;
@@ -25,15 +29,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Validated
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class PermissionController {
 
-    private final PermissionService permissionService;
-
-    public PermissionController(PermissionService permissionService) {
-        this.permissionService = permissionService;
-    }
-
-    @GetMapping("/api/permissions")
+    PermissionService permissionService;
+@GetMapping("/api/permissions")
     public ResponseEntity<ApiResponse<ResultPaginationDTO>> getPermissions(
             @RequestParam(required = false) PermissionMethodENUM method,
             @RequestParam(required = false) String module,
@@ -86,3 +88,4 @@ public class PermissionController {
                         exists));
     }
 }
+

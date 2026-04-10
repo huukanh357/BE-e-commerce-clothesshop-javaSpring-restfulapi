@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.controller;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.ApiResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.file.FileUploadResponse;
 import ClothesShop.spring_restapi_clothesshop.service.FileService;
@@ -14,15 +18,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/files")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class FileController {
 
-    private final FileService fileService;
-
-    public FileController(FileService fileService) {
-        this.fileService = fileService;
-    }
-
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    FileService fileService;
+@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<FileUploadResponse>> upload(
             @RequestParam MultipartFile file,
             @RequestParam String folder) {
@@ -31,3 +33,4 @@ public class FileController {
                 .body(ApiResponse.created("File uploaded", response));
     }
 }
+

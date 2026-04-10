@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.controller;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.ApiResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.ResultPaginationDTO;
 import ClothesShop.spring_restapi_clothesshop.dto.category.CategoryCreateRequest;
@@ -24,15 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Validated
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class CategoryController {
 
-    private final CategoryService categoryService;
-
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
-
-    @GetMapping("/api/categories")
+    CategoryService categoryService;
+@GetMapping("/api/categories")
     public ResponseEntity<ApiResponse<ResultPaginationDTO>> getAllCategories(Pageable pageable) {
         Page<CategoryResponse> page = categoryService.getAllCategories(pageable);
         ResultPaginationDTO result = ResultPaginationDTO.fromPage(page);
@@ -82,3 +84,4 @@ public class CategoryController {
                 exists));
     }
 }
+

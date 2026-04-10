@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.controller;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.ApiResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.ResultPaginationDTO;
 import ClothesShop.spring_restapi_clothesshop.dto.productDetail.ProductDetailCreateRequest;
@@ -23,15 +27,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Validated
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class ProductDetailController {
 
-    private final ProductDetailService productDetailService;
-
-    public ProductDetailController(ProductDetailService productDetailService) {
-        this.productDetailService = productDetailService;
-    }
-
-    @GetMapping("/api/product-details")
+    ProductDetailService productDetailService;
+@GetMapping("/api/product-details")
     public ResponseEntity<ApiResponse<ResultPaginationDTO>> getAllProductDetails(Pageable pageable) {
         Page<ProductDetailResponse> page = productDetailService.getAllProductDetails(pageable);
         ResultPaginationDTO result = ResultPaginationDTO.fromPage(page);
@@ -77,3 +79,4 @@ public class ProductDetailController {
         return ResponseEntity.noContent().build();
     }
 }
+

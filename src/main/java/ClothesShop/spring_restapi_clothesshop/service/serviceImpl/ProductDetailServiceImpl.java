@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.productDetail.ProductDetailCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.productDetail.ProductDetailResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.productDetail.ProductDetailUpdateRequest;
@@ -10,6 +14,7 @@ import ClothesShop.spring_restapi_clothesshop.model.ProductDetail;
 import ClothesShop.spring_restapi_clothesshop.repository.ProductDetailRepository;
 import ClothesShop.spring_restapi_clothesshop.repository.ProductRepository;
 import ClothesShop.spring_restapi_clothesshop.service.ProductDetailService;
+import ClothesShop.spring_restapi_clothesshop.mapper.ProductDetailMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,16 +22,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class ProductDetailServiceImpl implements ProductDetailService {
 
-    private final ProductDetailRepository productDetailRepository;
-    private final ProductRepository productRepository;
-
-    public ProductDetailServiceImpl(ProductDetailRepository productDetailRepository,
-            ProductRepository productRepository) {
-        this.productDetailRepository = productDetailRepository;
-        this.productRepository = productRepository;
-    }
+    ProductDetailRepository productDetailRepository;
+    ProductRepository productRepository;
+    ProductDetailMapper productDetailMapper;
 
     @Override
     public ProductDetailResponse createProductDetail(ProductDetailCreateRequest request) {
@@ -40,26 +43,23 @@ public class ProductDetailServiceImpl implements ProductDetailService {
                     request.getProductId() + "-" + request.getSize() + "-" + request.getColor());
         }
 
-        ProductDetail detail = new ProductDetail();
+        ProductDetail detail = productDetailMapper.toEntity(request);
         detail.setProduct(product);
-        detail.setSize(request.getSize());
-        detail.setColor(request.getColor());
-        detail.setStockQuantity(request.getStockQuantity());
 
         ProductDetail savedDetail = productDetailRepository.save(detail);
-        return ProductDetailResponse.fromEntity(savedDetail);
+        return productDetailMapper.toResponse(savedDetail);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ProductDetailResponse getProductDetailById(Long id) {
-        return ProductDetailResponse.fromEntity(findProductDetailByIdOrThrow(id));
+        return productDetailMapper.toResponse(findProductDetailByIdOrThrow(id));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<ProductDetailResponse> getAllProductDetails(Pageable pageable) {
-        return productDetailRepository.findAll(pageable).map(ProductDetailResponse::fromEntity);
+        return productDetailRepository.findAll(pageable).map(productDetailMapper::toResponse);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class ProductDetailServiceImpl implements ProductDetailService {
         if (!productRepository.existsById(productId)) {
             throw new ResourceNotFoundException("Product", "id", productId);
         }
-        return productDetailRepository.findByProduct_Id(productId, pageable).map(ProductDetailResponse::fromEntity);
+        return productDetailRepository.findByProduct_Id(productId, pageable).map(productDetailMapper::toResponse);
     }
 
     @Override
@@ -87,18 +87,10 @@ public class ProductDetailServiceImpl implements ProductDetailService {
                     }
                 });
 
-        if (request.getSize() != null) {
-            detail.setSize(request.getSize());
-        }
-        if (request.getColor() != null) {
-            detail.setColor(request.getColor());
-        }
-        if (request.getStockQuantity() != null) {
-            detail.setStockQuantity(request.getStockQuantity());
-        }
+        productDetailMapper.updateFromRequest(request, detail);
 
         ProductDetail updatedDetail = productDetailRepository.save(detail);
-        return ProductDetailResponse.fromEntity(updatedDetail);
+        return productDetailMapper.toResponse(updatedDetail);
     }
 
     @Override

@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.controller;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.ApiResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.ResultPaginationDTO;
 import ClothesShop.spring_restapi_clothesshop.dto.role.RoleCreateRequest;
@@ -24,15 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Validated
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class RoleController {
 
-    private final RoleService roleService;
-
-    public RoleController(RoleService roleService) {
-        this.roleService = roleService;
-    }
-
-    @GetMapping("/api/roles")
+    RoleService roleService;
+@GetMapping("/api/roles")
     public ResponseEntity<ApiResponse<ResultPaginationDTO>> getAllRoles(Pageable pageable) {
         Page<RoleResponse> page = roleService.getAllRoles(pageable);
         ResultPaginationDTO result = ResultPaginationDTO.fromPage(page);
@@ -80,3 +82,4 @@ public class RoleController {
                 .ok(ApiResponse.success(exists ? "Role name already exists" : "Role name available", exists));
     }
 }
+

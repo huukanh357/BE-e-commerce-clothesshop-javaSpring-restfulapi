@@ -246,8 +246,6 @@ public class AuthServiceImpl implements AuthService {
 
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);
-
-        // Revoke all old refresh tokens to force user re-login on other devices
         refreshTokenRepository.revokeAllByUserId(user.getId());
 
         log.info("Password changed successfully for user {}", email);
@@ -321,3 +319,4 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 }
+

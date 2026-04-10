@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.controller;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.ApiResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.cart.CartUserResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.cartDetail.CartItemRequest;
@@ -20,15 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/me/cart")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class CartUserController {
 
-    private final CartService cartService;
-
-    public CartUserController(CartService cartService) {
-        this.cartService = cartService;
-    }
-
-    @GetMapping
+    CartService cartService;
+@GetMapping
     public ResponseEntity<ApiResponse<CartUserResponse>> getMyCart(
             @AuthenticationPrincipal Jwt jwt) {
         CartUserResponse cart = cartService.getMyCart(extractUserId(jwt));
@@ -75,3 +77,4 @@ public class CartUserController {
         return userId.longValue();
     }
 }
+

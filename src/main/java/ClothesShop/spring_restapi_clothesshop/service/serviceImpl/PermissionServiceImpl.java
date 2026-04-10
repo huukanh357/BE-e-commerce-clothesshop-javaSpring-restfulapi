@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.permission.PermissionCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.permission.PermissionResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.permission.PermissionUpdateRequest;
@@ -9,6 +13,7 @@ import ClothesShop.spring_restapi_clothesshop.model.Permission;
 import ClothesShop.spring_restapi_clothesshop.model.ENUM.PermissionMethodENUM;
 import ClothesShop.spring_restapi_clothesshop.repository.PermissionRepository;
 import ClothesShop.spring_restapi_clothesshop.service.PermissionService;
+import ClothesShop.spring_restapi_clothesshop.mapper.PermissionMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,13 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class PermissionServiceImpl implements PermissionService {
 
-    private final PermissionRepository permissionRepository;
-
-    public PermissionServiceImpl(PermissionRepository permissionRepository) {
-        this.permissionRepository = permissionRepository;
-    }
+    PermissionRepository permissionRepository;
+    PermissionMapper permissionMapper;
 
     @Override
     public PermissionResponse createPermission(PermissionCreateRequest request) {
@@ -30,20 +35,16 @@ public class PermissionServiceImpl implements PermissionService {
             throw new DuplicateResourceException("Permission", "name", request.getName());
         }
 
-        Permission permission = new Permission();
-        permission.setName(request.getName());
-        permission.setApiPath(request.getApiPath());
-        permission.setMethod(request.getMethod());
-        permission.setModule(request.getModule());
+        Permission permission = permissionMapper.toEntity(request);
 
         Permission savedPermission = permissionRepository.save(permission);
-        return PermissionResponse.fromEntity(savedPermission);
+        return permissionMapper.toResponse(savedPermission);
     }
 
     @Override
     @Transactional(readOnly = true)
     public PermissionResponse getPermissionById(Long id) {
-        return PermissionResponse.fromEntity(findPermissionByIdOrThrow(id));
+        return permissionMapper.toResponse(findPermissionByIdOrThrow(id));
     }
 
     @Override
@@ -51,13 +52,13 @@ public class PermissionServiceImpl implements PermissionService {
     public PermissionResponse getPermissionByName(String name) {
         Permission permission = permissionRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Permission", "name", name));
-        return PermissionResponse.fromEntity(permission);
+        return permissionMapper.toResponse(permission);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<PermissionResponse> getAllPermissions(Pageable pageable) {
-        return permissionRepository.findAll(pageable).map(PermissionResponse::fromEntity);
+        return permissionRepository.findAll(pageable).map(permissionMapper::toResponse);
     }
 
     @Override
@@ -65,15 +66,15 @@ public class PermissionServiceImpl implements PermissionService {
     public Page<PermissionResponse> filterPermissions(PermissionMethodENUM method, String module, Pageable pageable) {
         if (method != null && module != null && !module.isBlank()) {
             return permissionRepository.findByMethodAndModule(method, module, pageable)
-                    .map(PermissionResponse::fromEntity);
+                    .map(permissionMapper::toResponse);
         }
         if (method != null) {
-            return permissionRepository.findByMethod(method, pageable).map(PermissionResponse::fromEntity);
+            return permissionRepository.findByMethod(method, pageable).map(permissionMapper::toResponse);
         }
         if (module != null && !module.isBlank()) {
-            return permissionRepository.findByModule(module, pageable).map(PermissionResponse::fromEntity);
+            return permissionRepository.findByModule(module, pageable).map(permissionMapper::toResponse);
         }
-        return permissionRepository.findAll(pageable).map(PermissionResponse::fromEntity);
+        return permissionRepository.findAll(pageable).map(permissionMapper::toResponse);
     }
 
     @Override
@@ -85,21 +86,10 @@ public class PermissionServiceImpl implements PermissionService {
             throw new DuplicateResourceException("Permission", "name", request.getName());
         }
 
-        if (request.getName() != null) {
-            permission.setName(request.getName());
-        }
-        if (request.getApiPath() != null) {
-            permission.setApiPath(request.getApiPath());
-        }
-        if (request.getMethod() != null) {
-            permission.setMethod(request.getMethod());
-        }
-        if (request.getModule() != null) {
-            permission.setModule(request.getModule());
-        }
+        permissionMapper.updateFromRequest(request, permission);
 
         Permission updatedPermission = permissionRepository.save(permission);
-        return PermissionResponse.fromEntity(updatedPermission);
+        return permissionMapper.toResponse(updatedPermission);
     }
 
     @Override

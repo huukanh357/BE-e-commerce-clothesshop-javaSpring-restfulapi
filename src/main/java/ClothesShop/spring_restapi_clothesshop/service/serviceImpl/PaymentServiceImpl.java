@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.payment.PaymentCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.payment.PaymentResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.payment.PaymentUpdateRequest;
@@ -14,6 +18,7 @@ import ClothesShop.spring_restapi_clothesshop.repository.OrderRepository;
 import ClothesShop.spring_restapi_clothesshop.repository.PaymentRepository;
 import ClothesShop.spring_restapi_clothesshop.repository.UserRepository;
 import ClothesShop.spring_restapi_clothesshop.service.PaymentService;
+import ClothesShop.spring_restapi_clothesshop.mapper.PaymentMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,18 +26,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
 
-    private final PaymentRepository paymentRepository;
-    private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
-
-    public PaymentServiceImpl(PaymentRepository paymentRepository, OrderRepository orderRepository,
-            UserRepository userRepository) {
-        this.paymentRepository = paymentRepository;
-        this.orderRepository = orderRepository;
-        this.userRepository = userRepository;
-    }
+    PaymentRepository paymentRepository;
+    OrderRepository orderRepository;
+    UserRepository userRepository;
+    PaymentMapper paymentMapper;
 
     @Override
     public PaymentResponse createPayment(PaymentCreateRequest request) {
@@ -45,21 +47,21 @@ public class PaymentServiceImpl implements PaymentService {
             throw new DuplicateResourceException("Payment", "orderId", request.getOrderId());
         }
 
-        Payment payment = new Payment();
+        Payment payment = paymentMapper.toEntity(request);
         payment.setOrder(order);
         payment.setUser(user);
-        payment.setAmount(request.getAmount());
-        payment.setMethod(request.getMethod());
-        payment.setStatus(request.getStatus() == null ? PaymentStatusEnum.PENDING : request.getStatus());
+        if (payment.getStatus() == null) {
+            payment.setStatus(PaymentStatusEnum.PENDING);
+        }
 
         Payment savedPayment = paymentRepository.save(payment);
-        return PaymentResponse.fromEntity(savedPayment);
+        return paymentMapper.toResponse(savedPayment);
     }
 
     @Override
     @Transactional(readOnly = true)
     public PaymentResponse getPaymentById(Long id) {
-        return PaymentResponse.fromEntity(findPaymentByIdOrThrow(id));
+        return paymentMapper.toResponse(findPaymentByIdOrThrow(id));
     }
 
     @Override
@@ -67,7 +69,7 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentResponse getPaymentByOrderId(Long orderId) {
         Payment payment = paymentRepository.findByOrder_Id(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment", "orderId", orderId));
-        return PaymentResponse.fromEntity(payment);
+        return paymentMapper.toResponse(payment);
     }
 
     @Override
@@ -76,19 +78,19 @@ public class PaymentServiceImpl implements PaymentService {
         if (!userRepository.existsById(userId)) {
             throw new ResourceNotFoundException("User", "id", userId);
         }
-        return paymentRepository.findByUser_Id(userId, pageable).map(PaymentResponse::fromEntity);
+        return paymentRepository.findByUser_Id(userId, pageable).map(paymentMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<PaymentResponse> getAllPayments(Pageable pageable) {
-        return paymentRepository.findAll(pageable).map(PaymentResponse::fromEntity);
+        return paymentRepository.findAll(pageable).map(paymentMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<PaymentResponse> getPaymentsByStatus(PaymentStatusEnum status, Pageable pageable) {
-        return paymentRepository.findByStatus(status, pageable).map(PaymentResponse::fromEntity);
+        return paymentRepository.findByStatus(status, pageable).map(paymentMapper::toResponse);
     }
 
     @Override
@@ -106,7 +108,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         Payment updatedPayment = paymentRepository.save(payment);
-        return PaymentResponse.fromEntity(updatedPayment);
+        return paymentMapper.toResponse(updatedPayment);
     }
 
     @Override
@@ -115,14 +117,13 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.deleteById(id);
     }
 
-    // USER (me)
     @Override
     @Transactional(readOnly = true)
     public Page<PaymentResponse> getMyPayments(Long userId, Pageable pageable) {
         if (!userRepository.existsById(userId)) {
             throw new ResourceNotFoundException("User", "id", userId);
         }
-        return paymentRepository.findByUser_Id(userId, pageable).map(PaymentResponse::fromEntity);
+        return paymentRepository.findByUser_Id(userId, pageable).map(paymentMapper::toResponse);
     }
 
     @Override
@@ -132,7 +133,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (!payment.getUser().getId().equals(userId)) {
             throw new ResourceNotFoundException("Payment", "id", paymentId);
         }
-        return PaymentResponse.fromEntity(payment);
+        return paymentMapper.toResponse(payment);
     }
 
     @Override
@@ -158,7 +159,7 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setStatus(PaymentStatusEnum.PENDING);
 
         Payment savedPayment = paymentRepository.save(payment);
-        return PaymentResponse.fromEntity(savedPayment);
+        return paymentMapper.toResponse(savedPayment);
     }
 
     private Payment findPaymentByIdOrThrow(Long id) {

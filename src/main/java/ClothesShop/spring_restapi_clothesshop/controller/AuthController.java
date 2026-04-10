@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.controller;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.auth.AuthService;
 import ClothesShop.spring_restapi_clothesshop.auth.dto.ChangePasswordRequest;
 import ClothesShop.spring_restapi_clothesshop.auth.dto.LoginRequest;
@@ -32,19 +36,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class AuthController {
 
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
     private static final String COOKIE_PATH = "/api/auth";
     private static final int COOKIE_MAX_AGE = 259200;
 
-    private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
-
-    @PostMapping("/login")
+    AuthService authService;
+@PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest httpRequest,
@@ -174,3 +176,4 @@ public class AuthController {
         return request.getRemoteAddr();
     }
 }
+

@@ -92,8 +92,6 @@ public class DatabaseSeeder implements CommandLineRunner {
 
         private List<Permission> seedPermissions() {
                 List<Permission> permissions = new ArrayList<>();
-
-                // USER
                 permissions.add(permission("VIEW_USERS", "/api/users", PermissionMethodENUM.GET, "USER"));
                 permissions.add(permission("VIEW_USER", "/api/users/{id}", PermissionMethodENUM.GET, "USER"));
                 permissions.add(permission("VIEW_USER_BY_USERNAME", "/api/users/username/{username}",
@@ -104,16 +102,12 @@ public class DatabaseSeeder implements CommandLineRunner {
                 permissions.add(permission("CREATE_USER", "/api/users", PermissionMethodENUM.POST, "USER"));
                 permissions.add(permission("UPDATE_USER", "/api/users/{id}", PermissionMethodENUM.PUT, "USER"));
                 permissions.add(permission("DELETE_USER", "/api/users/{id}", PermissionMethodENUM.DELETE, "USER"));
-
-                // AUTH
                 permissions.add(permission("GET_ME", "/api/auth/me", PermissionMethodENUM.GET, "AUTH"));
                 permissions.add(permission("UPDATE_ME", "/api/auth/me/update", PermissionMethodENUM.PATCH, "AUTH"));
                 permissions.add(permission("UPLOAD_ME_AVATAR", "/api/auth/me/avatar", PermissionMethodENUM.POST,
                                 "AUTH"));
                 permissions.add(permission("CHANGE_PASSWORD", "/api/auth/me/password", PermissionMethodENUM.PATCH,
                                 "AUTH"));
-
-                // ROLE
                 permissions.add(permission("VIEW_ROLES", "/api/roles", PermissionMethodENUM.GET, "ROLE"));
                 permissions.add(permission("VIEW_ROLE", "/api/roles/{id}", PermissionMethodENUM.GET, "ROLE"));
                 permissions.add(permission("VIEW_ROLE_BY_NAME", "/api/roles/name/{name}", PermissionMethodENUM.GET,
@@ -123,8 +117,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                 permissions.add(permission("DELETE_ROLE", "/api/roles/{id}", PermissionMethodENUM.DELETE, "ROLE"));
                 permissions.add(permission("CHECK_ROLE_NAME", "/api/roles/check/name", PermissionMethodENUM.GET,
                                 "ROLE"));
-
-                // PERMISSION
                 permissions.add(permission("VIEW_PERMISSIONS", "/api/permissions", PermissionMethodENUM.GET,
                                 "PERMISSION"));
                 permissions.add(permission("VIEW_PERMISSION", "/api/permissions/{id}", PermissionMethodENUM.GET,
@@ -143,8 +135,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                 permissions.add(permission("CHECK_PERMISSION_NAME", "/api/permissions/check/name",
                                 PermissionMethodENUM.GET,
                                 "PERMISSION"));
-
-                // PRODUCT
                 permissions.add(permission("VIEW_PRODUCTS", "/api/products", PermissionMethodENUM.GET, "PRODUCT"));
                 permissions.add(permission("VIEW_PRODUCT", "/api/products/{id}", PermissionMethodENUM.GET, "PRODUCT"));
                 permissions.add(
@@ -174,8 +164,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                 permissions
                                 .add(permission("CHECK_PRODUCT_NAME", "/api/products/check/name",
                                                 PermissionMethodENUM.GET, "PRODUCT"));
-
-                // PRODUCT DETAIL
                 permissions
                                 .add(permission("VIEW_PRODUCT_DETAILS", "/api/product-details",
                                                 PermissionMethodENUM.GET, "PRODUCT"));
@@ -193,8 +181,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                 permissions.add(permission("DELETE_PRODUCT_DETAIL", "/api/product-details/{id}",
                                 PermissionMethodENUM.DELETE,
                                 "PRODUCT"));
-
-                // CART
                 permissions.add(permission("VIEW_CARTS", "/api/carts", PermissionMethodENUM.GET, "CART"));
                 permissions.add(permission("VIEW_MY_CART", "/api/me/cart", PermissionMethodENUM.GET, "CART"));
                 permissions.add(permission("VIEW_CART", "/api/carts/{id}", PermissionMethodENUM.GET, "CART"));
@@ -212,8 +198,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                                 PermissionMethodENUM.DELETE, "CART"));
                 permissions.add(permission("CLEAR_MY_CART", "/api/me/cart/items",
                                 PermissionMethodENUM.DELETE, "CART"));
-
-                // CART DETAIL
                 permissions.add(permission("VIEW_CART_DETAILS", "/api/cart-details", PermissionMethodENUM.GET, "CART"));
                 permissions.add(permission("VIEW_CART_DETAIL", "/api/cart-details/{id}", PermissionMethodENUM.GET,
                                 "CART"));
@@ -226,8 +210,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                 permissions
                                 .add(permission("DELETE_CART_DETAIL", "/api/cart-details/{id}",
                                                 PermissionMethodENUM.DELETE, "CART"));
-
-                // ORDER
                 permissions.add(permission("VIEW_ORDERS", "/api/orders", PermissionMethodENUM.GET, "ORDER"));
                 permissions.add(permission("VIEW_ORDER", "/api/orders/{id}", PermissionMethodENUM.GET, "ORDER"));
                 permissions
@@ -243,8 +225,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                                 "ORDER"));
                 permissions.add(permission("CREATE_MY_ORDER", "/api/me/orders", PermissionMethodENUM.POST,
                                 "ORDER"));
-
-                // ORDER ITEM
                 permissions.add(permission("VIEW_ORDER_ITEMS", "/api/order-items", PermissionMethodENUM.GET, "ORDER"));
                 permissions.add(permission("VIEW_ORDER_ITEM", "/api/order-items/{id}", PermissionMethodENUM.GET,
                                 "ORDER"));
@@ -256,8 +236,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                                 "ORDER"));
                 permissions.add(permission("DELETE_ORDER_ITEM", "/api/order-items/{id}", PermissionMethodENUM.DELETE,
                                 "ORDER"));
-
-                // PAYMENT
                 permissions.add(permission("VIEW_PAYMENTS", "/api/payments", PermissionMethodENUM.GET, "PAYMENT"));
                 permissions.add(permission("VIEW_PAYMENT", "/api/payments/{id}", PermissionMethodENUM.GET, "PAYMENT"));
                 permissions.add(permission("VIEW_PAYMENT_BY_ORDER", "/api/payments/order/{orderId}",
@@ -363,3 +341,4 @@ public class DatabaseSeeder implements CommandLineRunner {
                                 .orElseThrow(() -> new RuntimeException("Role not found: " + name));
         }
 }
+

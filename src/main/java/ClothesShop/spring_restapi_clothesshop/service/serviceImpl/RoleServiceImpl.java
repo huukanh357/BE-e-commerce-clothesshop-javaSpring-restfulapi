@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.role.RoleCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.role.RoleResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.role.RoleUpdateRequest;
@@ -8,6 +12,7 @@ import ClothesShop.spring_restapi_clothesshop.exception.ResourceNotFoundExceptio
 import ClothesShop.spring_restapi_clothesshop.model.Role;
 import ClothesShop.spring_restapi_clothesshop.repository.RoleRepository;
 import ClothesShop.spring_restapi_clothesshop.service.RoleService;
+import ClothesShop.spring_restapi_clothesshop.mapper.RoleMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,13 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class RoleServiceImpl implements RoleService {
 
-    private final RoleRepository roleRepository;
-
-    public RoleServiceImpl(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
-    }
+    RoleRepository roleRepository;
+    RoleMapper roleMapper;
 
     @Override
     public RoleResponse createRole(RoleCreateRequest request) {
@@ -29,17 +34,16 @@ public class RoleServiceImpl implements RoleService {
             throw new DuplicateResourceException("Role", "name", request.getName());
         }
 
-        Role role = new Role();
-        role.setName(request.getName());
+        Role role = roleMapper.toEntity(request);
 
         Role savedRole = roleRepository.save(role);
-        return RoleResponse.fromEntity(savedRole);
+        return roleMapper.toResponse(savedRole);
     }
 
     @Override
     @Transactional(readOnly = true)
     public RoleResponse getRoleById(Long id) {
-        return RoleResponse.fromEntity(findRoleByIdOrThrow(id));
+        return roleMapper.toResponse(findRoleByIdOrThrow(id));
     }
 
     @Override
@@ -47,13 +51,13 @@ public class RoleServiceImpl implements RoleService {
     public RoleResponse getRoleByName(String name) {
         Role role = roleRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Role", "name", name));
-        return RoleResponse.fromEntity(role);
+        return roleMapper.toResponse(role);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<RoleResponse> getAllRoles(Pageable pageable) {
-        return roleRepository.findAll(pageable).map(RoleResponse::fromEntity);
+        return roleRepository.findAll(pageable).map(roleMapper::toResponse);
     }
 
     @Override
@@ -66,11 +70,11 @@ public class RoleServiceImpl implements RoleService {
         }
 
         if (request.getName() != null) {
-            role.setName(request.getName());
+            roleMapper.updateFromRequest(request, role);
         }
 
         Role updatedRole = roleRepository.save(role);
-        return RoleResponse.fromEntity(updatedRole);
+        return roleMapper.toResponse(updatedRole);
     }
 
     @Override

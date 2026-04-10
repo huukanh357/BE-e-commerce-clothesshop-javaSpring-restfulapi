@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.config.FileUploadProperties;
 import ClothesShop.spring_restapi_clothesshop.dto.file.FileUploadResponse;
 import ClothesShop.spring_restapi_clothesshop.exception.FileUploadException;
@@ -13,15 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class FileServiceImpl implements FileService {
 
-    private final FileUploadProperties uploadProperties;
-
-    public FileServiceImpl(FileUploadProperties uploadProperties) {
-        this.uploadProperties = uploadProperties;
-    }
-
-    @Override
+    FileUploadProperties uploadProperties;
+@Override
     public FileUploadResponse upload(MultipartFile file, String folder) {
         validateFile(file, folder);
 
@@ -91,3 +93,4 @@ public class FileServiceImpl implements FileService {
         return fileName.substring(dotIndex + 1);
     }
 }
+

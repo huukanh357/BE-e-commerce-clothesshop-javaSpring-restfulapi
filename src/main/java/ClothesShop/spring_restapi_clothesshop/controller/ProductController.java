@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.controller;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.ApiResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.ResultPaginationDTO;
 import ClothesShop.spring_restapi_clothesshop.dto.product.ProductCreateRequest;
@@ -30,15 +34,13 @@ import java.util.List;
 
 @RestController
 @Validated
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class ProductController {
 
-    private final ProductService productService;
-
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
-
-    @GetMapping("/api/products")
+    ProductService productService;
+@GetMapping("/api/products")
     public ResponseEntity<ApiResponse<ResultPaginationDTO>> getAllProducts(Pageable pageable) {
         Page<ProductResponse> page = productService.getAllProducts(pageable);
         ResultPaginationDTO result = ResultPaginationDTO.fromPage(page);
@@ -117,3 +119,4 @@ public class ProductController {
                 .ok(ApiResponse.success(exists ? "Product name already exists" : "Product name available", exists));
     }
 }
+

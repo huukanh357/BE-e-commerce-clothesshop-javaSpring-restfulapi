@@ -24,11 +24,10 @@ public interface OrderService {
     OrderResponse updateOrder(Long id, OrderUpdateRequest request);
 
     void deleteOrder(Long id);
-
-    // USER (me)
     Page<OrderResponse> getMyOrders(Long userId, Pageable pageable);
 
     OrderResponse getMyOrderById(Long userId, Long orderId);
 
     OrderResponse createMyOrder(Long userId, OrderUserCreateRequest request);
 }
+

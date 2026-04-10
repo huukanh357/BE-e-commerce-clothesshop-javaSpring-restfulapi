@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.cart.CartCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.cart.CartResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.cart.CartUpdateRequest;
@@ -18,6 +22,7 @@ import ClothesShop.spring_restapi_clothesshop.repository.CartRepository;
 import ClothesShop.spring_restapi_clothesshop.repository.ProductDetailRepository;
 import ClothesShop.spring_restapi_clothesshop.repository.UserRepository;
 import ClothesShop.spring_restapi_clothesshop.service.CartService;
+import ClothesShop.spring_restapi_clothesshop.mapper.CartMapper;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -27,24 +32,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class CartServiceImpl implements CartService {
 
-    private final CartRepository cartRepository;
-    private final CartDetailRepository cartDetailRepository;
-    private final UserRepository userRepository;
-    private final ProductDetailRepository productDetailRepository;
-
-    public CartServiceImpl(CartRepository cartRepository,
-            CartDetailRepository cartDetailRepository,
-            UserRepository userRepository,
-            ProductDetailRepository productDetailRepository) {
-        this.cartRepository = cartRepository;
-        this.cartDetailRepository = cartDetailRepository;
-        this.userRepository = userRepository;
-        this.productDetailRepository = productDetailRepository;
-    }
-
-    // ========== ADMIN ==========
+    CartRepository cartRepository;
+    CartDetailRepository cartDetailRepository;
+    UserRepository userRepository;
+    ProductDetailRepository productDetailRepository;
+    CartMapper cartMapper;
 
     @Override
     public CartResponse createCart(CartCreateRequest request) {
@@ -56,13 +53,14 @@ public class CartServiceImpl implements CartService {
 
         Cart cart = new Cart();
         cart.setUser(user);
-        return CartResponse.fromEntity(cartRepository.save(cart));
+
+        return cartMapper.toResponse(cartRepository.save(cart));
     }
 
     @Override
     @Transactional(readOnly = true)
     public CartResponse getCartById(Long id) {
-        return CartResponse.fromEntity(findCartByIdOrThrow(id));
+        return cartMapper.toResponse(findCartByIdOrThrow(id));
     }
 
     @Override
@@ -70,13 +68,13 @@ public class CartServiceImpl implements CartService {
     public CartResponse getCartByUserId(Long userId) {
         Cart cart = cartRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart", "userId", userId));
-        return CartResponse.fromEntity(cart);
+        return cartMapper.toResponse(cart);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<CartResponse> getAllCarts(Pageable pageable) {
-        return cartRepository.findAll(pageable).map(CartResponse::fromEntity);
+        return cartRepository.findAll(pageable).map(cartMapper::toResponse);
     }
 
     @Override
@@ -93,7 +91,7 @@ public class CartServiceImpl implements CartService {
             cart.setUser(user);
         }
 
-        return CartResponse.fromEntity(cartRepository.save(cart));
+        return cartMapper.toResponse(cartRepository.save(cart));
     }
 
     @Override
@@ -101,8 +99,6 @@ public class CartServiceImpl implements CartService {
         findCartByIdOrThrow(id);
         cartRepository.deleteById(id);
     }
-
-    // ========== USER (me) ==========
 
     @Override
     @Transactional(readOnly = true)
@@ -215,8 +211,6 @@ public class CartServiceImpl implements CartService {
 
         return CartUserResponse.from(cart, List.of());
     }
-
-    // ========== Helpers ==========
 
     private Cart findCartByIdOrThrow(Long id) {
         return cartRepository.findById(id)

@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.order.OrderCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.order.OrderResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.order.OrderUserCreateRequest;
@@ -15,6 +19,8 @@ import ClothesShop.spring_restapi_clothesshop.repository.CartRepository;
 import ClothesShop.spring_restapi_clothesshop.repository.OrderRepository;
 import ClothesShop.spring_restapi_clothesshop.repository.UserRepository;
 import ClothesShop.spring_restapi_clothesshop.service.OrderService;
+import ClothesShop.spring_restapi_clothesshop.mapper.OrderMapper;
+import ClothesShop.spring_restapi_clothesshop.mapper.ShippingInfoMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,18 +28,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
-    private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
-    private final CartRepository cartRepository;
-
-    public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository,
-            CartRepository cartRepository) {
-        this.orderRepository = orderRepository;
-        this.userRepository = userRepository;
-        this.cartRepository = cartRepository;
-    }
+    OrderRepository orderRepository;
+    UserRepository userRepository;
+    CartRepository cartRepository;
+    OrderMapper orderMapper;
+    ShippingInfoMapper shippingInfoMapper;
 
     @Override
     public OrderResponse createOrder(OrderCreateRequest request) {
@@ -45,27 +49,27 @@ public class OrderServiceImpl implements OrderService {
                     .orElseThrow(() -> new ResourceNotFoundException("Cart", "id", request.getCartId()));
         }
 
-        Order order = new Order();
+        Order order = orderMapper.toEntity(request);
         order.setUser(user);
         order.setCart(cart);
-        order.setTotalAmount(request.getTotalAmount());
-        order.setStatus(request.getStatus() == null ? OrderStatusEnum.PENDING : request.getStatus());
-        order.setShippingInfo(buildShippingInfo(request.getShippingInfo()));
+        if (order.getStatus() == null) {
+            order.setStatus(OrderStatusEnum.PENDING);
+        }
 
         Order savedOrder = orderRepository.save(order);
-        return OrderResponse.fromEntity(savedOrder);
+        return orderMapper.toResponse(savedOrder);
     }
 
     @Override
     @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long id) {
-        return OrderResponse.fromEntity(findOrderByIdOrThrow(id));
+        return orderMapper.toResponse(findOrderByIdOrThrow(id));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<OrderResponse> getAllOrders(Pageable pageable) {
-        return orderRepository.findAll(pageable).map(OrderResponse::fromEntity);
+        return orderRepository.findAll(pageable).map(orderMapper::toResponse);
     }
 
     @Override
@@ -74,13 +78,13 @@ public class OrderServiceImpl implements OrderService {
         if (!userRepository.existsById(userId)) {
             throw new ResourceNotFoundException("User", "id", userId);
         }
-        return orderRepository.findByUser_Id(userId, pageable).map(OrderResponse::fromEntity);
+        return orderRepository.findByUser_Id(userId, pageable).map(orderMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<OrderResponse> getOrdersByStatus(OrderStatusEnum status, Pageable pageable) {
-        return orderRepository.findByStatus(status, pageable).map(OrderResponse::fromEntity);
+        return orderRepository.findByStatus(status, pageable).map(orderMapper::toResponse);
     }
 
     @Override
@@ -102,7 +106,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Order updatedOrder = orderRepository.save(order);
-        return OrderResponse.fromEntity(updatedOrder);
+        return orderMapper.toResponse(updatedOrder);
     }
 
     @Override
@@ -114,7 +118,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(readOnly = true)
     public Page<OrderResponse> getMyOrders(Long userId, Pageable pageable) {
-        return orderRepository.findByUser_Id(userId, pageable).map(OrderResponse::fromEntity);
+        return orderRepository.findByUser_Id(userId, pageable).map(orderMapper::toResponse);
     }
 
     @Override
@@ -124,7 +128,7 @@ public class OrderServiceImpl implements OrderService {
         if (!order.getUser().getId().equals(userId)) {
             throw new ResourceNotFoundException("Order", "id", orderId);
         }
-        return OrderResponse.fromEntity(order);
+        return orderMapper.toResponse(order);
     }
 
     @Override
@@ -148,7 +152,7 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatusEnum.PENDING);
         order.setShippingInfo(buildShippingInfo(request.getShippingInfo()));
 
-        return OrderResponse.fromEntity(orderRepository.save(order));
+        return orderMapper.toResponse(orderRepository.save(order));
     }
 
     private Order findOrderByIdOrThrow(Long id) {

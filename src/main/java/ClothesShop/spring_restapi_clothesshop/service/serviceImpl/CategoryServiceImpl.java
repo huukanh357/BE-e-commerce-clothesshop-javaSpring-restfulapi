@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.category.CategoryCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.category.CategoryResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.category.CategoryUpdateRequest;
@@ -8,6 +12,7 @@ import ClothesShop.spring_restapi_clothesshop.exception.ResourceNotFoundExceptio
 import ClothesShop.spring_restapi_clothesshop.model.Category;
 import ClothesShop.spring_restapi_clothesshop.repository.CategoryRepository;
 import ClothesShop.spring_restapi_clothesshop.service.CategoryService;
+import ClothesShop.spring_restapi_clothesshop.mapper.CategoryMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -17,13 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class CategoryServiceImpl implements CategoryService {
 
-    private final CategoryRepository categoryRepository;
-
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
-    }
+    CategoryRepository categoryRepository;
+    CategoryMapper categoryMapper;
 
     @Override
     @CacheEvict(cacheNames = { "categoryById", "categoryByName", "categoriesPage" }, allEntries = true)
@@ -32,18 +37,18 @@ public class CategoryServiceImpl implements CategoryService {
             throw new DuplicateResourceException("Category", "name", request.getName());
         }
 
-        Category category = new Category();
-        category.setName(request.getName().trim());
+        Category category = categoryMapper.toEntity(request);
+        category.setName(category.getName().trim());
 
         Category saved = categoryRepository.save(category);
-        return CategoryResponse.fromEntity(saved);
+        return categoryMapper.toResponse(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
     @Cacheable(cacheNames = "categoryById", key = "#id")
     public CategoryResponse getCategoryById(Long id) {
-        return CategoryResponse.fromEntity(findCategoryByIdOrThrow(id));
+        return categoryMapper.toResponse(findCategoryByIdOrThrow(id));
     }
 
     @Override
@@ -52,14 +57,14 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse getCategoryByName(String name) {
         Category category = categoryRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "name", name));
-        return CategoryResponse.fromEntity(category);
+        return categoryMapper.toResponse(category);
     }
 
     @Override
     @Transactional(readOnly = true)
     @Cacheable(cacheNames = "categoriesPage")
     public Page<CategoryResponse> getAllCategories(Pageable pageable) {
-        return categoryRepository.findAll(pageable).map(CategoryResponse::fromEntity);
+        return categoryRepository.findAll(pageable).map(categoryMapper::toResponse);
     }
 
     @Override
@@ -73,12 +78,12 @@ public class CategoryServiceImpl implements CategoryService {
                 throw new DuplicateResourceException("Category", "name", newName);
             }
             if (!newName.isEmpty()) {
-                category.setName(newName);
+                categoryMapper.updateFromRequest(request, category);
             }
         }
 
         Category updated = categoryRepository.save(category);
-        return CategoryResponse.fromEntity(updated);
+        return categoryMapper.toResponse(updated);
     }
 
     @Override

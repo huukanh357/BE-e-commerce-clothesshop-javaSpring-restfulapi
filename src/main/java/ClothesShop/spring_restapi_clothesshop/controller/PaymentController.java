@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.controller;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.ApiResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.ResultPaginationDTO;
 import ClothesShop.spring_restapi_clothesshop.dto.payment.PaymentCreateRequest;
@@ -25,15 +29,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Validated
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class PaymentController {
 
-    private final PaymentService paymentService;
-
-    public PaymentController(PaymentService paymentService) {
-        this.paymentService = paymentService;
-    }
-
-    @GetMapping("/api/payments")
+    PaymentService paymentService;
+@GetMapping("/api/payments")
     public ResponseEntity<ApiResponse<ResultPaginationDTO>> getPayments(
             @RequestParam(required = false) PaymentStatusEnum status,
             Pageable pageable) {
@@ -89,3 +91,4 @@ public class PaymentController {
         return ResponseEntity.noContent().build();
     }
 }
+

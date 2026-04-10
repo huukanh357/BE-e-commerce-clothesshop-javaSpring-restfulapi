@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.cartDetail.CartDetailCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.cartDetail.CartDetailResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.cartDetail.CartDetailUpdateRequest;
@@ -12,6 +16,7 @@ import ClothesShop.spring_restapi_clothesshop.repository.CartDetailRepository;
 import ClothesShop.spring_restapi_clothesshop.repository.CartRepository;
 import ClothesShop.spring_restapi_clothesshop.repository.ProductDetailRepository;
 import ClothesShop.spring_restapi_clothesshop.service.CartDetailService;
+import ClothesShop.spring_restapi_clothesshop.mapper.CartDetailMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,20 +24,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class CartDetailServiceImpl implements CartDetailService {
 
-    private final CartDetailRepository cartDetailRepository;
-    private final CartRepository cartRepository;
-    private final ProductDetailRepository productDetailRepository;
-
-    public CartDetailServiceImpl(
-            CartDetailRepository cartDetailRepository,
-            CartRepository cartRepository,
-            ProductDetailRepository productDetailRepository) {
-        this.cartDetailRepository = cartDetailRepository;
-        this.cartRepository = cartRepository;
-        this.productDetailRepository = productDetailRepository;
-    }
+    CartDetailRepository cartDetailRepository;
+    CartRepository cartRepository;
+    ProductDetailRepository productDetailRepository;
+    CartDetailMapper cartDetailMapper;
 
     @Override
     public CartDetailResponse createCartDetail(CartDetailCreateRequest request) {
@@ -49,25 +49,24 @@ public class CartDetailServiceImpl implements CartDetailService {
                     request.getCartId() + "-" + request.getProductDetailId());
         }
 
-        CartDetail cartDetail = new CartDetail();
+        CartDetail cartDetail = cartDetailMapper.toEntity(request);
         cartDetail.setCart(cart);
         cartDetail.setProductDetail(productDetail);
-        cartDetail.setQuantity(request.getQuantity());
 
         CartDetail savedCartDetail = cartDetailRepository.save(cartDetail);
-        return CartDetailResponse.fromEntity(savedCartDetail);
+        return cartDetailMapper.toResponse(savedCartDetail);
     }
 
     @Override
     @Transactional(readOnly = true)
     public CartDetailResponse getCartDetailById(Long id) {
-        return CartDetailResponse.fromEntity(findCartDetailByIdOrThrow(id));
+        return cartDetailMapper.toResponse(findCartDetailByIdOrThrow(id));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<CartDetailResponse> getAllCartDetails(Pageable pageable) {
-        return cartDetailRepository.findAll(pageable).map(CartDetailResponse::fromEntity);
+        return cartDetailRepository.findAll(pageable).map(cartDetailMapper::toResponse);
     }
 
     @Override
@@ -76,7 +75,7 @@ public class CartDetailServiceImpl implements CartDetailService {
         if (!cartRepository.existsById(cartId)) {
             throw new ResourceNotFoundException("Cart", "id", cartId);
         }
-        return cartDetailRepository.findByCart_Id(cartId, pageable).map(CartDetailResponse::fromEntity);
+        return cartDetailRepository.findByCart_Id(cartId, pageable).map(cartDetailMapper::toResponse);
     }
 
     @Override
@@ -88,7 +87,7 @@ public class CartDetailServiceImpl implements CartDetailService {
         }
 
         CartDetail updatedCartDetail = cartDetailRepository.save(cartDetail);
-        return CartDetailResponse.fromEntity(updatedCartDetail);
+        return cartDetailMapper.toResponse(updatedCartDetail);
     }
 
     @Override

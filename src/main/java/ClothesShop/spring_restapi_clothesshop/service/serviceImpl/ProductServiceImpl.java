@@ -1,5 +1,9 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.product.ProductCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.product.ProductFilterRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.product.ProductResponse;
@@ -15,6 +19,7 @@ import ClothesShop.spring_restapi_clothesshop.repository.ProductRepository;
 import ClothesShop.spring_restapi_clothesshop.repository.ProductSpecification;
 import ClothesShop.spring_restapi_clothesshop.service.FileService;
 import ClothesShop.spring_restapi_clothesshop.service.ProductService;
+import ClothesShop.spring_restapi_clothesshop.mapper.ProductMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,22 +36,16 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class ProductServiceImpl implements ProductService {
 
-    private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
-    private final FileService fileService;
-    private final ObjectMapper objectMapper;
-
-    public ProductServiceImpl(ProductRepository productRepository,
-            CategoryRepository categoryRepository,
-            FileService fileService,
-            ObjectMapper objectMapper) {
-        this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
-        this.fileService = fileService;
-        this.objectMapper = objectMapper;
-    }
+    ProductRepository productRepository;
+    CategoryRepository categoryRepository;
+    FileService fileService;
+    ObjectMapper objectMapper;
+    ProductMapper productMapper;
 
     @Override
     @CacheEvict(cacheNames = { "productById", "productByName", "productsPage",
@@ -56,23 +55,18 @@ public class ProductServiceImpl implements ProductService {
             throw new DuplicateResourceException("Product", "name", request.getName());
         }
 
-        Product product = new Product();
+        Product product = productMapper.toEntity(request);
         product.setCategories(resolveCategories(request.getCategoryNames()));
-        product.setName(request.getName());
-        product.setDescription(request.getDescription());
-        product.setPrice(request.getPrice());
-        product.setStockQuantity(request.getStockQuantity());
-        product.setImageUrl(request.getImageUrl());
 
         Product savedProduct = productRepository.save(product);
-        return ProductResponse.fromEntity(savedProduct);
+        return productMapper.toResponse(savedProduct);
     }
 
     @Override
     @Transactional(readOnly = true)
     @Cacheable(cacheNames = "productById", key = "#id")
     public ProductResponse getProductById(Long id) {
-        return ProductResponse.fromEntity(findProductByIdOrThrow(id));
+        return productMapper.toResponse(findProductByIdOrThrow(id));
     }
 
     @Override
@@ -81,21 +75,21 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse getProductByName(String name) {
         Product product = productRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "name", name));
-        return ProductResponse.fromEntity(product);
+        return productMapper.toResponse(product);
     }
 
     @Override
     @Transactional(readOnly = true)
     @Cacheable(cacheNames = "productsPage")
     public Page<ProductResponse> getAllProducts(Pageable pageable) {
-        return productRepository.findAll(pageable).map(ProductResponse::fromEntity);
+        return productRepository.findAll(pageable).map(productMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
     @Cacheable(cacheNames = "productsByCategoryPage")
     public Page<ProductResponse> getProductsByCategory(String categoryName, Pageable pageable) {
-        return productRepository.findByCategoryName(categoryName, pageable).map(ProductResponse::fromEntity);
+        return productRepository.findByCategoryName(categoryName, pageable).map(productMapper::toResponse);
     }
 
     @Override
@@ -107,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
                         filterRequest.getMaxPrice(),
                         filterRequest.getCategoryNames(),
                         filterRequest.getSizes()),
-                pageable).map(ProductResponse::fromEntity);
+                pageable).map(productMapper::toResponse);
     }
 
     @Override
@@ -124,24 +118,11 @@ public class ProductServiceImpl implements ProductService {
         if (request.getCategoryNames() != null) {
             product.setCategories(resolveCategories(request.getCategoryNames()));
         }
-        if (request.getName() != null) {
-            product.setName(request.getName());
-        }
-        if (request.getDescription() != null) {
-            product.setDescription(request.getDescription());
-        }
-        if (request.getPrice() != null) {
-            product.setPrice(request.getPrice());
-        }
-        if (request.getStockQuantity() != null) {
-            product.setStockQuantity(request.getStockQuantity());
-        }
-        if (request.getImageUrl() != null) {
-            product.setImageUrl(request.getImageUrl());
-        }
+
+        productMapper.updateFromRequest(request, product);
 
         Product updatedProduct = productRepository.save(product);
-        return ProductResponse.fromEntity(updatedProduct);
+        return productMapper.toResponse(updatedProduct);
     }
 
     @Override
@@ -165,7 +146,7 @@ public class ProductServiceImpl implements ProductService {
         product.setImageUrl(serializeImageUrls(imageUrls));
 
         Product updatedProduct = productRepository.save(product);
-        return ProductResponse.fromEntity(updatedProduct);
+        return productMapper.toResponse(updatedProduct);
     }
 
     @Override
