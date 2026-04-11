@@ -1,6 +1,7 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
 import ClothesShop.spring_restapi_clothesshop.exception.AppException;
+import ClothesShop.spring_restapi_clothesshop.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -42,11 +43,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse createOrder(OrderCreateRequest request) {
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> AppException.resourceNotFound("User", "id", request.getUserId()));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "User", "id", request.getUserId()));
         Cart cart = null;
         if (request.getCartId() != null) {
             cart = cartRepository.findById(request.getCartId())
-                    .orElseThrow(() -> AppException.resourceNotFound("Cart", "id", request.getCartId()));
+                    .orElseThrow(
+                            () -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Cart", "id", request.getCartId()));
         }
 
         Order order = orderMapper.toEntity(request);
@@ -76,7 +78,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public Page<OrderResponse> getOrdersByUserId(Long userId, Pageable pageable) {
         if (!userRepository.existsById(userId)) {
-            throw AppException.resourceNotFound("User", "id", userId);
+            throw new AppException(ErrorCode.RESOURCE_NOT_FOUND, "User", "id", userId);
         }
         return orderRepository.findByUser_Id(userId, pageable).map(orderMapper::toResponse);
     }
@@ -93,7 +95,8 @@ public class OrderServiceImpl implements OrderService {
 
         if (request.getCartId() != null) {
             Cart cart = cartRepository.findById(request.getCartId())
-                    .orElseThrow(() -> AppException.resourceNotFound("Cart", "id", request.getCartId()));
+                    .orElseThrow(
+                            () -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Cart", "id", request.getCartId()));
             order.setCart(cart);
         }
 
@@ -126,7 +129,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse getMyOrderById(Long userId, Long orderId) {
         Order order = findOrderByIdOrThrow(orderId);
         if (!order.getUser().getId().equals(userId)) {
-            throw AppException.resourceNotFound("Order", "id", orderId);
+            throw new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Order", "id", orderId);
         }
         return orderMapper.toResponse(order);
     }
@@ -134,14 +137,15 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse createMyOrder(Long userId, OrderUserCreateRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> AppException.resourceNotFound("User", "id", userId));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "User", "id", userId));
 
         Cart cart = null;
         if (request.getCartId() != null) {
             cart = cartRepository.findById(request.getCartId())
-                    .orElseThrow(() -> AppException.resourceNotFound("Cart", "id", request.getCartId()));
+                    .orElseThrow(
+                            () -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Cart", "id", request.getCartId()));
             if (!cart.getUser().getId().equals(userId)) {
-                throw AppException.resourceNotFound("Cart", "id", request.getCartId());
+                throw new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Cart", "id", request.getCartId());
             }
         }
 
@@ -157,7 +161,7 @@ public class OrderServiceImpl implements OrderService {
 
     private Order findOrderByIdOrThrow(Long id) {
         return orderRepository.findById(id)
-                .orElseThrow(() -> AppException.resourceNotFound("Order", "id", id));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Order", "id", id));
     }
 
     private ShippingInfo buildShippingInfo(ShippingInfoRequest request) {

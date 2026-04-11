@@ -17,27 +17,8 @@ public class AppException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
-    public static AppException resourceNotFound(String resourceName, String fieldName, Object fieldValue) {
-        return new AppException(
-                ErrorCode.RESOURCE_NOT_FOUND,
-                String.format("Không tìm thấy %s với %s = '%s'", resourceName, fieldName, fieldValue));
-    }
-
-    public static AppException duplicateResource(String resourceName, String fieldName, Object fieldValue) {
-        return new AppException(
-                ErrorCode.RESOURCE_ALREADY_EXISTS,
-                String.format("%s đã tồn tại với %s = '%s'", resourceName, fieldName, fieldValue));
-    }
-
-    public static AppException invalidToken(String message) {
-        return new AppException(ErrorCode.AUTH_INVALID_TOKEN, message);
-    }
-
-    public static AppException insufficientStock(String message) {
-        return new AppException(ErrorCode.INSUFFICIENT_STOCK, message);
-    }
-
-    public static AppException fileUploadFailed(String message) {
-        return new AppException(ErrorCode.FILE_UPLOAD_FAILED, message);
+    public AppException(ErrorCode errorCode, Object... messageArgs) {
+        super(errorCode.format(messageArgs));
+        this.errorCode = errorCode;
     }
 }

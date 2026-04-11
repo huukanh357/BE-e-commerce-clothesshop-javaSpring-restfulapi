@@ -1,6 +1,7 @@
 package ClothesShop.spring_restapi_clothesshop.controller;
 
 import ClothesShop.spring_restapi_clothesshop.exception.AppException;
+import ClothesShop.spring_restapi_clothesshop.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -46,7 +47,8 @@ public class AuthController {
     private static final int COOKIE_MAX_AGE = 259200;
 
     AuthService authService;
-@PostMapping("/login")
+
+    @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest httpRequest,
@@ -78,7 +80,7 @@ public class AuthController {
 
         String rawRefreshToken = extractRefreshToken(body, httpRequest);
         if (rawRefreshToken == null) {
-            throw AppException.invalidToken("Refresh token khong duoc cung cap");
+            throw new AppException(ErrorCode.REFRESH_TOKEN_MISSING);
         }
 
         LoginResponse loginResponse = authService.refresh(rawRefreshToken);

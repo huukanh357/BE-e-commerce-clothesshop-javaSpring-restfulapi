@@ -1,6 +1,7 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
 import ClothesShop.spring_restapi_clothesshop.exception.AppException;
+import ClothesShop.spring_restapi_clothesshop.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,7 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileServiceImpl implements FileService {
 
     FileUploadProperties uploadProperties;
-@Override
+
+    @Override
     public FileUploadResponse upload(MultipartFile file, String folder) {
         validateFile(file, folder);
 
@@ -35,14 +37,14 @@ public class FileServiceImpl implements FileService {
         try {
             Files.createDirectories(targetDir);
         } catch (IOException e) {
-            throw AppException.fileUploadFailed("Không thể tạo thư mục lưu trữ: " + e.getMessage());
+            throw new AppException(ErrorCode.FILE_STORAGE_DIRECTORY_CREATE_FAILED, e.getMessage());
         }
 
         try {
             Path targetPath = targetDir.resolve(storedName);
             Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw AppException.fileUploadFailed("Không thể lưu file: " + e.getMessage());
+            throw new AppException(ErrorCode.FILE_STORAGE_SAVE_FAILED, e.getMessage());
         }
 
         String fileUrl = "/uploads/" + folder + "/" + storedName;
@@ -55,33 +57,33 @@ public class FileServiceImpl implements FileService {
 
     private void validateFile(MultipartFile file, String folder) {
         if (file == null || file.isEmpty()) {
-            throw AppException.fileUploadFailed("Không có file được cung cấp");
+            throw new AppException(ErrorCode.FILE_REQUIRED);
         }
 
         if (folder == null || folder.isBlank()) {
-            throw AppException.fileUploadFailed("Folder không được để trống");
+            throw new AppException(ErrorCode.UPLOAD_FOLDER_REQUIRED);
         }
 
         String normalizedFolder = folder.trim().toLowerCase();
         if (!uploadProperties.getAllowedFolders().contains(normalizedFolder)) {
             String allowed = String.join(", ", uploadProperties.getAllowedFolders());
-            throw AppException.fileUploadFailed("Thư mục không hợp lệ. Chỉ chấp nhận: " + allowed);
+            throw new AppException(ErrorCode.INVALID_UPLOAD_FOLDER, allowed);
         }
 
         String originalName = file.getOriginalFilename();
         if (originalName == null || originalName.isBlank()) {
-            throw AppException.fileUploadFailed("Tên file không được để trống");
+            throw new AppException(ErrorCode.FILE_NAME_REQUIRED);
         }
 
         String extension = getExtension(originalName).toLowerCase();
         if (!uploadProperties.getAllowedExtensions().contains(extension)) {
             String allowed = String.join(", ", uploadProperties.getAllowedExtensions());
-            throw AppException.fileUploadFailed("Định dạng file không được phép. Chỉ chấp nhận: " + allowed);
+            throw new AppException(ErrorCode.FILE_EXTENSION_NOT_ALLOWED, allowed);
         }
 
         if (file.getSize() > uploadProperties.getMaxFileSize()) {
             long maxMb = uploadProperties.getMaxFileSize() / (1024 * 1024);
-            throw AppException.fileUploadFailed("Kích thước file vượt quá " + maxMb + " MB");
+            throw new AppException(ErrorCode.FILE_SIZE_EXCEEDED, maxMb);
         }
     }
 

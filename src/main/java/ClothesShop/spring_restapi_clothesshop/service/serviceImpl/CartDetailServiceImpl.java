@@ -1,6 +1,7 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
 import ClothesShop.spring_restapi_clothesshop.exception.AppException;
+import ClothesShop.spring_restapi_clothesshop.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -36,13 +37,18 @@ public class CartDetailServiceImpl implements CartDetailService {
     @Override
     public CartDetailResponse createCartDetail(CartDetailCreateRequest request) {
         Cart cart = cartRepository.findById(request.getCartId())
-                .orElseThrow(() -> AppException.resourceNotFound("Cart", "id", request.getCartId()));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Cart", "id", request.getCartId()));
         ProductDetail productDetail = productDetailRepository.findById(request.getProductDetailId())
-                .orElseThrow(() -> AppException.resourceNotFound("ProductDetail", "id", request.getProductDetailId()));
+                .orElseThrow(() -> new AppException(
+                        ErrorCode.RESOURCE_NOT_FOUND,
+                        "ProductDetail",
+                        "id",
+                        request.getProductDetailId()));
 
         if (cartDetailRepository.existsByCart_IdAndProductDetail_Id(request.getCartId(),
                 request.getProductDetailId())) {
-            throw AppException.duplicateResource(
+            throw new AppException(
+                    ErrorCode.RESOURCE_ALREADY_EXISTS,
                     "CartDetail",
                     "cartId-productDetailId",
                     request.getCartId() + "-" + request.getProductDetailId());
@@ -72,7 +78,7 @@ public class CartDetailServiceImpl implements CartDetailService {
     @Transactional(readOnly = true)
     public Page<CartDetailResponse> getCartDetailsByCartId(Long cartId, Pageable pageable) {
         if (!cartRepository.existsById(cartId)) {
-            throw AppException.resourceNotFound("Cart", "id", cartId);
+            throw new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Cart", "id", cartId);
         }
         return cartDetailRepository.findByCart_Id(cartId, pageable).map(cartDetailMapper::toResponse);
     }
@@ -97,7 +103,7 @@ public class CartDetailServiceImpl implements CartDetailService {
 
     private CartDetail findCartDetailByIdOrThrow(Long id) {
         return cartDetailRepository.findById(id)
-                .orElseThrow(() -> AppException.resourceNotFound("CartDetail", "id", id));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "CartDetail", "id", id));
     }
 
 }

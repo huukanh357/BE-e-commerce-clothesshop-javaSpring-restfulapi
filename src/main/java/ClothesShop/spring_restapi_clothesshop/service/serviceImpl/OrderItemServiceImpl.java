@@ -1,6 +1,7 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
 import ClothesShop.spring_restapi_clothesshop.exception.AppException;
+import ClothesShop.spring_restapi_clothesshop.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -36,9 +37,13 @@ public class OrderItemServiceImpl implements OrderItemService {
     @Override
     public OrderItemResponse createOrderItem(OrderItemCreateRequest request) {
         Order order = orderRepository.findById(request.getOrderId())
-                .orElseThrow(() -> AppException.resourceNotFound("Order", "id", request.getOrderId()));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Order", "id", request.getOrderId()));
         ProductDetail productDetail = productDetailRepository.findById(request.getProductDetailId())
-                .orElseThrow(() -> AppException.resourceNotFound("ProductDetail", "id", request.getProductDetailId()));
+                .orElseThrow(() -> new AppException(
+                        ErrorCode.RESOURCE_NOT_FOUND,
+                        "ProductDetail",
+                        "id",
+                        request.getProductDetailId()));
 
         OrderItem orderItem = orderItemMapper.toEntity(request);
         orderItem.setOrder(order);
@@ -64,7 +69,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     @Transactional(readOnly = true)
     public Page<OrderItemResponse> getOrderItemsByOrderId(Long orderId, Pageable pageable) {
         if (!orderRepository.existsById(orderId)) {
-            throw AppException.resourceNotFound("Order", "id", orderId);
+            throw new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Order", "id", orderId);
         }
         return orderItemRepository.findByOrder_Id(orderId, pageable).map(orderItemMapper::toResponse);
     }
@@ -87,7 +92,7 @@ public class OrderItemServiceImpl implements OrderItemService {
 
     private OrderItem findOrderItemByIdOrThrow(Long id) {
         return orderItemRepository.findById(id)
-                .orElseThrow(() -> AppException.resourceNotFound("OrderItem", "id", id));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "OrderItem", "id", id));
     }
 
 }

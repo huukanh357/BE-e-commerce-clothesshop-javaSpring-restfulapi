@@ -1,6 +1,7 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
 import ClothesShop.spring_restapi_clothesshop.exception.AppException;
+import ClothesShop.spring_restapi_clothesshop.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -33,7 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
     @CacheEvict(cacheNames = { "categoryById", "categoryByName", "categoriesPage" }, allEntries = true)
     public CategoryResponse createCategory(CategoryCreateRequest request) {
         if (categoryRepository.existsByName(request.getName())) {
-            throw AppException.duplicateResource("Category", "name", request.getName());
+            throw new AppException(ErrorCode.RESOURCE_ALREADY_EXISTS, "Category", "name", request.getName());
         }
 
         Category category = categoryMapper.toEntity(request);
@@ -55,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Cacheable(cacheNames = "categoryByName", key = "#name")
     public CategoryResponse getCategoryByName(String name) {
         Category category = categoryRepository.findByName(name)
-                .orElseThrow(() -> AppException.resourceNotFound("Category", "name", name));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Category", "name", name));
         return categoryMapper.toResponse(category);
     }
 
@@ -74,7 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (request.getName() != null) {
             String newName = request.getName().trim();
             if (!newName.isEmpty() && !newName.equals(category.getName()) && categoryRepository.existsByName(newName)) {
-                throw AppException.duplicateResource("Category", "name", newName);
+                throw new AppException(ErrorCode.RESOURCE_ALREADY_EXISTS, "Category", "name", newName);
             }
             if (!newName.isEmpty()) {
                 categoryMapper.updateFromRequest(request, category);
@@ -100,6 +101,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     private Category findCategoryByIdOrThrow(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> AppException.resourceNotFound("Category", "id", id));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Category", "id", id));
     }
 }

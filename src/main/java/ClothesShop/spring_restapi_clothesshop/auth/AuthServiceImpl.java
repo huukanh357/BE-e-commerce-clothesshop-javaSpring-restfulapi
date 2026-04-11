@@ -1,6 +1,7 @@
 package ClothesShop.spring_restapi_clothesshop.auth;
 
 import ClothesShop.spring_restapi_clothesshop.exception.AppException;
+import ClothesShop.spring_restapi_clothesshop.exception.ErrorCode;
 import ClothesShop.spring_restapi_clothesshop.auth.dto.ChangePasswordRequest;
 import ClothesShop.spring_restapi_clothesshop.auth.dto.LoginRequest;
 import ClothesShop.spring_restapi_clothesshop.auth.dto.LoginResponse;
@@ -87,7 +88,7 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> AppException.resourceNotFound("User", "email", request.email()));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "User", "email", request.email()));
 
         String rawAccessToken = generateAccessToken(authentication, user.getId());
         String rawRefreshToken = generateRefreshToken(user.getId(), user.getEmail());
@@ -102,15 +103,15 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
-            throw AppException.duplicateResource("User", "username", request.username());
+            throw new AppException(ErrorCode.RESOURCE_ALREADY_EXISTS, "User", "username", request.username());
         }
 
         if (userRepository.existsByEmail(request.email())) {
-            throw AppException.duplicateResource("User", "email", request.email());
+            throw new AppException(ErrorCode.RESOURCE_ALREADY_EXISTS, "User", "email", request.email());
         }
 
         Role defaultRole = roleRepository.findByName("USER")
-                .orElseThrow(() -> AppException.resourceNotFound("Role", "name", "USER"));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Role", "name", "USER"));
 
         User user = new User();
         user.setUsername(request.username());
@@ -139,14 +140,14 @@ public class AuthServiceImpl implements AuthService {
         String tokenHash = hashToken(rawRefreshToken);
 
         RefreshToken storedToken = refreshTokenRepository.findByToken(tokenHash)
-                .orElseThrow(() -> AppException.invalidToken("Refresh token không hợp lệ"));
+                .orElseThrow(() -> new AppException(ErrorCode.REFRESH_TOKEN_INVALID));
 
         if (storedToken.isRevoked()) {
-            throw AppException.invalidToken("Refresh token đã bị thu hồi");
+            throw new AppException(ErrorCode.REFRESH_TOKEN_REVOKED);
         }
 
         if (storedToken.getExpiresAt().isBefore(Instant.now())) {
-            throw AppException.invalidToken("Refresh token đã hết hạn");
+            throw new AppException(ErrorCode.REFRESH_TOKEN_EXPIRED);
         }
 
         storedToken.setRevoked(true);
@@ -170,7 +171,7 @@ public class AuthServiceImpl implements AuthService {
         String tokenHash = hashToken(rawRefreshToken);
 
         RefreshToken storedToken = refreshTokenRepository.findByToken(tokenHash)
-                .orElseThrow(() -> AppException.invalidToken("Refresh token không hợp lệ"));
+                .orElseThrow(() -> new AppException(ErrorCode.REFRESH_TOKEN_INVALID));
 
         storedToken.setRevoked(true);
         refreshTokenRepository.save(storedToken);
@@ -181,7 +182,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(readOnly = true)
     public UserResponse getMe(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> AppException.resourceNotFound("User", "email", email));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "User", "email", email));
         return UserResponse.fromEntity(user);
     }
 
@@ -189,7 +190,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public UserResponse updateMe(String email, UpdateMeRequest request) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> AppException.resourceNotFound("User", "email", email));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "User", "email", email));
 
         if (request.phone() != null) {
             user.setPhone(request.phone());
@@ -215,7 +216,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public UserResponse uploadMyAvatar(String email, MultipartFile file) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> AppException.resourceNotFound("User", "email", email));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "User", "email", email));
 
         FileUploadResponse uploaded = fileService.upload(file, "avatars");
         user.setAvatar(uploaded.getFileUrl());
@@ -232,7 +233,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> AppException.resourceNotFound("User", "email", email));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "User", "email", email));
 
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Mật khẩu hiện tại không đúng");

@@ -1,6 +1,7 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
 import ClothesShop.spring_restapi_clothesshop.exception.AppException;
+import ClothesShop.spring_restapi_clothesshop.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -46,7 +47,7 @@ public class CartServiceImpl implements CartService {
         User user = findUserByIdOrThrow(request.getUserId());
 
         if (cartRepository.existsByUser_Id(request.getUserId())) {
-            throw AppException.duplicateResource("Cart", "userId", request.getUserId());
+            throw new AppException(ErrorCode.RESOURCE_ALREADY_EXISTS, "Cart", "userId", request.getUserId());
         }
 
         Cart cart = new Cart();
@@ -65,7 +66,7 @@ public class CartServiceImpl implements CartService {
     @Transactional(readOnly = true)
     public CartResponse getCartByUserId(Long userId) {
         Cart cart = cartRepository.findByUser_Id(userId)
-                .orElseThrow(() -> AppException.resourceNotFound("Cart", "userId", userId));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Cart", "userId", userId));
         return cartMapper.toResponse(cart);
     }
 
@@ -83,7 +84,7 @@ public class CartServiceImpl implements CartService {
             User user = findUserByIdOrThrow(request.getUserId());
 
             if (cartRepository.existsByUser_Id(request.getUserId())) {
-                throw AppException.duplicateResource("Cart", "userId", request.getUserId());
+                throw new AppException(ErrorCode.RESOURCE_ALREADY_EXISTS, "Cart", "userId", request.getUserId());
             }
 
             cart.setUser(user);
@@ -117,12 +118,18 @@ public class CartServiceImpl implements CartService {
         });
 
         ProductDetail pd = productDetailRepository.findById(request.getProductDetailId())
-                .orElseThrow(() -> AppException.resourceNotFound("ProductDetail", "id", request.getProductDetailId()));
+                .orElseThrow(() -> new AppException(
+                        ErrorCode.RESOURCE_NOT_FOUND,
+                        "ProductDetail",
+                        "id",
+                        request.getProductDetailId()));
 
         if (pd.getStockQuantity() == 0) {
-            throw AppException.insufficientStock(
-                    String.format("Sản phẩm '%s' (size: %s, màu: %s) đã hết hàng",
-                            pd.getProduct().getName(), pd.getSize(), pd.getColor()));
+            throw new AppException(
+                    ErrorCode.PRODUCT_OUT_OF_STOCK,
+                    pd.getProduct().getName(),
+                    pd.getSize(),
+                    pd.getColor());
         }
 
         Optional<CartDetail> existingItem = cartDetailRepository
@@ -142,8 +149,7 @@ public class CartServiceImpl implements CartService {
         }
 
         if (newQuantity > pd.getStockQuantity()) {
-            throw AppException.insufficientStock(
-                    String.format("Số lượng vượt quá tồn kho. Tồn kho hiện tại: %d", pd.getStockQuantity()));
+            throw new AppException(ErrorCode.STOCK_EXCEEDS_AVAILABLE, pd.getStockQuantity());
         }
 
         cartDetail.setQuantity(newQuantity);
@@ -156,13 +162,13 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartUserResponse updateMyCartItem(Long userId, Long itemId, CartItemUpdateRequest request) {
         Cart cart = cartRepository.findByUser_Id(userId)
-                .orElseThrow(() -> AppException.resourceNotFound("Cart", "userId", userId));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Cart", "userId", userId));
 
         CartDetail cartDetail = cartDetailRepository.findById(itemId)
-                .orElseThrow(() -> AppException.resourceNotFound("CartDetail", "id", itemId));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "CartDetail", "id", itemId));
 
         if (!cartDetail.getCart().getId().equals(cart.getId())) {
-            throw AppException.resourceNotFound("CartDetail", "id", itemId);
+            throw new AppException(ErrorCode.RESOURCE_NOT_FOUND, "CartDetail", "id", itemId);
         }
 
         if (request.getQuantity() == 0) {
@@ -170,8 +176,7 @@ public class CartServiceImpl implements CartService {
         } else {
             ProductDetail pd = cartDetail.getProductDetail();
             if (request.getQuantity() > pd.getStockQuantity()) {
-                throw AppException.insufficientStock(
-                        String.format("Số lượng vượt quá tồn kho. Tồn kho hiện tại: %d", pd.getStockQuantity()));
+                throw new AppException(ErrorCode.STOCK_EXCEEDS_AVAILABLE, pd.getStockQuantity());
             }
             cartDetail.setQuantity(request.getQuantity());
             cartDetailRepository.save(cartDetail);
@@ -184,13 +189,13 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartUserResponse deleteMyCartItem(Long userId, Long itemId) {
         Cart cart = cartRepository.findByUser_Id(userId)
-                .orElseThrow(() -> AppException.resourceNotFound("Cart", "userId", userId));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Cart", "userId", userId));
 
         CartDetail cartDetail = cartDetailRepository.findById(itemId)
-                .orElseThrow(() -> AppException.resourceNotFound("CartDetail", "id", itemId));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "CartDetail", "id", itemId));
 
         if (!cartDetail.getCart().getId().equals(cart.getId())) {
-            throw AppException.resourceNotFound("CartDetail", "id", itemId);
+            throw new AppException(ErrorCode.RESOURCE_NOT_FOUND, "CartDetail", "id", itemId);
         }
 
         cartDetailRepository.delete(cartDetail);
@@ -202,7 +207,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartUserResponse clearMyCart(Long userId) {
         Cart cart = cartRepository.findByUser_Id(userId)
-                .orElseThrow(() -> AppException.resourceNotFound("Cart", "userId", userId));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Cart", "userId", userId));
 
         List<CartDetail> items = cartDetailRepository.findByCart_Id(cart.getId());
         cartDetailRepository.deleteAll(items);
@@ -212,11 +217,11 @@ public class CartServiceImpl implements CartService {
 
     private Cart findCartByIdOrThrow(Long id) {
         return cartRepository.findById(id)
-                .orElseThrow(() -> AppException.resourceNotFound("Cart", "id", id));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Cart", "id", id));
     }
 
     private User findUserByIdOrThrow(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> AppException.resourceNotFound("User", "id", userId));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "User", "id", userId));
     }
 }

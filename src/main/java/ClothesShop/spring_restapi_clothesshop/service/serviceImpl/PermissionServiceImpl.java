@@ -1,6 +1,7 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
 import ClothesShop.spring_restapi_clothesshop.exception.AppException;
+import ClothesShop.spring_restapi_clothesshop.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,7 +32,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public PermissionResponse createPermission(PermissionCreateRequest request) {
         if (permissionRepository.existsByName(request.getName())) {
-            throw AppException.duplicateResource("Permission", "name", request.getName());
+            throw new AppException(ErrorCode.RESOURCE_ALREADY_EXISTS, "Permission", "name", request.getName());
         }
 
         Permission permission = permissionMapper.toEntity(request);
@@ -50,7 +51,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Transactional(readOnly = true)
     public PermissionResponse getPermissionByName(String name) {
         Permission permission = permissionRepository.findByName(name)
-                .orElseThrow(() -> AppException.resourceNotFound("Permission", "name", name));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Permission", "name", name));
         return permissionMapper.toResponse(permission);
     }
 
@@ -82,7 +83,7 @@ public class PermissionServiceImpl implements PermissionService {
 
         if (request.getName() != null && !request.getName().equals(permission.getName())
                 && permissionRepository.existsByName(request.getName())) {
-            throw AppException.duplicateResource("Permission", "name", request.getName());
+            throw new AppException(ErrorCode.RESOURCE_ALREADY_EXISTS, "Permission", "name", request.getName());
         }
 
         permissionMapper.updateFromRequest(request, permission);
@@ -105,6 +106,6 @@ public class PermissionServiceImpl implements PermissionService {
 
     private Permission findPermissionByIdOrThrow(Long id) {
         return permissionRepository.findById(id)
-                .orElseThrow(() -> AppException.resourceNotFound("Permission", "id", id));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Permission", "id", id));
     }
 }

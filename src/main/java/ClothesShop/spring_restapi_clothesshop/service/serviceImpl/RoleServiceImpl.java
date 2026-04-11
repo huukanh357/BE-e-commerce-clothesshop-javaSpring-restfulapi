@@ -1,6 +1,7 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
 import ClothesShop.spring_restapi_clothesshop.exception.AppException;
+import ClothesShop.spring_restapi_clothesshop.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,7 +31,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleResponse createRole(RoleCreateRequest request) {
         if (roleRepository.existsByName(request.getName())) {
-            throw AppException.duplicateResource("Role", "name", request.getName());
+            throw new AppException(ErrorCode.RESOURCE_ALREADY_EXISTS, "Role", "name", request.getName());
         }
 
         Role role = roleMapper.toEntity(request);
@@ -49,7 +50,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(readOnly = true)
     public RoleResponse getRoleByName(String name) {
         Role role = roleRepository.findByName(name)
-                .orElseThrow(() -> AppException.resourceNotFound("Role", "name", name));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Role", "name", name));
         return roleMapper.toResponse(role);
     }
 
@@ -65,7 +66,7 @@ public class RoleServiceImpl implements RoleService {
 
         if (request.getName() != null && !request.getName().equals(role.getName())
                 && roleRepository.existsByName(request.getName())) {
-            throw AppException.duplicateResource("Role", "name", request.getName());
+            throw new AppException(ErrorCode.RESOURCE_ALREADY_EXISTS, "Role", "name", request.getName());
         }
 
         if (request.getName() != null) {
@@ -90,6 +91,6 @@ public class RoleServiceImpl implements RoleService {
 
     private Role findRoleByIdOrThrow(Long id) {
         return roleRepository.findById(id)
-                .orElseThrow(() -> AppException.resourceNotFound("Role", "id", id));
+                .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Role", "id", id));
     }
 }
