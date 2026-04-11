@@ -18,19 +18,19 @@ import java.math.BigDecimal;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderItemCreateRequest {
 
-    @NotNull(message = "Order id không được để trống")
-    @Min(value = 1, message = "Order id phải lớn hơn 0")
+    @NotNull(message = "ORDER_ID_REQUIRED")
+    @Min(value = 1, message = "ORDER_ID_INVALID")
     private Long orderId;
 
-    @NotNull(message = "Product detail id không được để trống")
-    @Min(value = 1, message = "Product detail id phải lớn hơn 0")
+    @NotNull(message = "PRODUCT_DETAIL_ID_REQUIRED")
+    @Min(value = 1, message = "PRODUCT_DETAIL_ID_INVALID")
     private Long productDetailId;
 
-    @NotNull(message = "Quantity không được để trống")
-    @Min(value = 1, message = "Quantity phải lớn hơn 0")
+    @NotNull(message = "QUANTITY_REQUIRED")
+    @Min(value = 1, message = "QUANTITY_INVALID")
     private Integer quantity;
 
-    @NotNull(message = "Price không được để trống")
+    @NotNull(message = "PRICE_REQUIRED")
     @DecimalMin(value = "0.0", inclusive = false, message = "Price phải lớn hơn 0")
     private BigDecimal price;
 }

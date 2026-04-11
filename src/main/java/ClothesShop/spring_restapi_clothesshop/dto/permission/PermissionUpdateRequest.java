@@ -16,14 +16,14 @@ import jakarta.validation.constraints.Size;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PermissionUpdateRequest {
 
-    @Size(max = 100, message = "Name tối đa 100 ký tự")
+    @Size(max = 100, message = "NAME_TOO_LONG_100")
     private String name;
 
-    @Size(max = 255, message = "Api path tối đa 255 ký tự")
+    @Size(max = 255, message = "API_PATH_TOO_LONG")
     private String apiPath;
 
     private PermissionMethodENUM method;
 
-    @Size(max = 100, message = "Module tối đa 100 ký tự")
+    @Size(max = 100, message = "MODULE_TOO_LONG")
     private String module;
 }

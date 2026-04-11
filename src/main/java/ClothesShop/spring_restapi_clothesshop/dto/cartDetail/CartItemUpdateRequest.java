@@ -17,8 +17,8 @@ import jakarta.validation.constraints.NotNull;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartItemUpdateRequest {
 
-    @NotNull(message = "quantity không được để trống")
-    @Min(value = 0, message = "quantity phải >= 0")
-    @Max(value = 99, message = "quantity không được vượt quá 99")
+    @NotNull(message = "QUANTITY_REQUIRED")
+    @Min(value = 0, message = "QUANTITY_NON_NEGATIVE")
+    @Max(value = 99, message = "QUANTITY_TOO_LARGE")
     private Integer quantity;
 }

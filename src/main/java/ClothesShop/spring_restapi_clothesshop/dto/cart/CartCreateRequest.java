@@ -16,7 +16,7 @@ import jakarta.validation.constraints.NotNull;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartCreateRequest {
 
-    @NotNull(message = "User id không được để trống")
-    @Min(value = 1, message = "User id phải lớn hơn 0")
+    @NotNull(message = "USER_ID_REQUIRED")
+    @Min(value = 1, message = "USER_ID_INVALID")
     private Long userId;
 }

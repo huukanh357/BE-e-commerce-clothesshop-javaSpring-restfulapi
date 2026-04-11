@@ -1,8 +1,7 @@
 package ClothesShop.spring_restapi_clothesshop.dto;
 
+import ClothesShop.spring_restapi_clothesshop.exception.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,93 +16,56 @@ import lombok.Setter;
 @Setter
 public class ApiResponse<T> {
 
-    // ========== FIELDS ==========
-
-    private int statusCode;
+    private int code;
     private String message;
-
-    // Ch? c? khi SUCCESS
-    private T data;
-
-    // Ch? c? khi ERROR
-    private String error;
-
-    // Ch? c? khi VALIDATION ERROR (nhi?u l?i)
-    private List<String> details;
-
-    // ========== CONSTRUCTORS ==========
+    private T result;
 
     public ApiResponse() {
     }
 
-    // Constructor cho Success
-    private ApiResponse(int statusCode, String message, T data) {
-        this.statusCode = statusCode;
+    private ApiResponse(int code, String message, T result) {
+        this.code = code;
         this.message = message;
-        this.data = data;
+        this.result = result;
     }
-
-    // Constructor cho Error
-    private ApiResponse(int statusCode, String message, String error, List<String> details) {
-        this.statusCode = statusCode;
-        this.message = message;
-        this.error = error;
-        this.details = details;
-    }
-
-    // ========== SUCCESS METHODS ==========
 
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(200, "Success", data);
+        return new ApiResponse<>(ErrorCode.SUCCESS.getCode(), ErrorCode.SUCCESS.getMessage(), data);
     }
 
     public static <T> ApiResponse<T> success(String message, T data) {
-        return new ApiResponse<>(200, message, data);
+        return new ApiResponse<>(ErrorCode.SUCCESS.getCode(), message, data);
     }
 
     public static <T> ApiResponse<T> created(T data) {
-        return new ApiResponse<>(201, "Created successfully", data);
+        return new ApiResponse<>(ErrorCode.SUCCESS.getCode(), "Created successfully", data);
     }
 
     public static <T> ApiResponse<T> created(String message, T data) {
-        return new ApiResponse<>(201, message, data);
+        return new ApiResponse<>(ErrorCode.SUCCESS.getCode(), message, data);
     }
 
-    // ========== ERROR METHODS ==========
-
-    public static <T> ApiResponse<T> notFound(String message) {
-        return new ApiResponse<>(404, message, "Not Found", null);
+    public static <T> ApiResponse<T> error(ErrorCode errorCode) {
+        return new ApiResponse<>(errorCode.getCode(), errorCode.getMessage(), null);
     }
 
-    public static <T> ApiResponse<T> badRequest(String message) {
-        return new ApiResponse<>(400, message, "Bad Request", null);
-    }
-
-    public static <T> ApiResponse<T> badRequest(String message, List<String> details) {
-        return new ApiResponse<>(400, message, "Bad Request", details);
-    }
-
-    public static <T> ApiResponse<T> conflict(String message) {
-        return new ApiResponse<>(409, message, "Conflict", null);
+    public static <T> ApiResponse<T> error(ErrorCode errorCode, String message) {
+        return new ApiResponse<>(errorCode.getCode(), message, null);
     }
 
     public static <T> ApiResponse<T> unauthorized(String message) {
-        return new ApiResponse<>(401, message, "Unauthorized", null);
+        return error(ErrorCode.AUTH_INVALID_TOKEN, message);
     }
 
     public static <T> ApiResponse<T> forbidden(String message) {
-        return new ApiResponse<>(403, message, "Forbidden", null);
+        return error(ErrorCode.ACCESS_DENIED, message);
     }
 
-    public static <T> ApiResponse<T> error(String message) {
-        return new ApiResponse<>(500, message, "Internal Server Error", null);
+    public static <T> ApiResponse<T> ofError(ErrorCode errorCode) {
+        return error(errorCode);
     }
 
-    public static <T> ApiResponse<T> of(int statusCode, String message, T data) {
-        return new ApiResponse<>(statusCode, message, data);
-    }
-
-    public static <T> ApiResponse<T> ofError(int statusCode, String message, String error) {
-        return new ApiResponse<>(statusCode, message, error, null);
+    public static <T> ApiResponse<T> ofError(ErrorCode errorCode, String message) {
+        return error(errorCode, message);
     }
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import ClothesShop.spring_restapi_clothesshop.model.Role;
+
 @Data
 @Builder
 @NoArgsConstructor

@@ -1,7 +1,6 @@
 package ClothesShop.spring_restapi_clothesshop.dto;
 
 import java.util.List;
-
 import org.springframework.data.domain.Page;
 
 public record ResultPaginationDTO(

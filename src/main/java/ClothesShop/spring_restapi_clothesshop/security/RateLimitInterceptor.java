@@ -1,6 +1,7 @@
 package ClothesShop.spring_restapi_clothesshop.security;
 
 import ClothesShop.spring_restapi_clothesshop.dto.ApiResponse;
+import ClothesShop.spring_restapi_clothesshop.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,7 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -41,7 +41,8 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
         if (!enabled || "OPTIONS".equalsIgnoreCase(request.getMethod())) {
             return true;
         }
@@ -64,15 +65,13 @@ public class RateLimitInterceptor implements HandlerInterceptor {
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 response.setCharacterEncoding("UTF-8");
 
-                ApiResponse<Void> body = ApiResponse.ofError(
-                        HttpStatus.TOO_MANY_REQUESTS.value(),
-                        "Bạn gọi API quá nhanh. Vui lòng thử lại sau.",
-                        "Too Many Requests");
+                ApiResponse<Void> body = ApiResponse.ofError(ErrorCode.RATE_LIMIT_EXCEEDED);
                 response.getWriter().write(objectMapper.writeValueAsString(body));
                 return false;
             }
         } catch (Exception ex) {
-            // Fail-open: nếu Redis có sự cố vẫn cho request đi qua để hệ thống không bị tê liệt.
+            // Fail-open: nếu Redis có sự cố vẫn cho request đi qua để hệ thống không bị tê
+            // liệt.
             log.warn("Rate limiting bỏ qua do lỗi Redis: {}", ex.getMessage());
         }
 

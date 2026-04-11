@@ -22,30 +22,30 @@ import jakarta.validation.constraints.Size;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserCreateRequest {
 
-    @NotBlank(message = "Username không được để trống")
-    @Size(min = 3, max = 50, message = "Username phải từ 3 đến 50 ký tự")
+    @NotBlank(message = "USERNAME_REQUIRED")
+    @Size(min = 3, max = 50, message = "USERNAME_INVALID")
     private String username;
 
-    @NotBlank(message = "Email không được để trống")
-    @Email(message = "Email không đúng định dạng")
+    @NotBlank(message = "EMAIL_REQUIRED")
+    @Email(message = "EMAIL_INVALID")
     private String email;
 
-    @NotBlank(message = "Password không được để trống")
-    @Size(min = 6, max = 255, message = "Password phải từ 6 đến 255 ký tự")
+    @NotBlank(message = "PASSWORD_REQUIRED")
+    @Size(min = 6, max = 255, message = "PASSWORD_INVALID")
     private String password;
 
-    @Pattern(regexp = "^(|[0-9+\\-\\s]{8,20})$", message = "Số điện thoại không hợp lệ")
+    @Pattern(regexp = "^(|[0-9+\\-\\s]{8,20})$", message = "PHONE_INVALID")
     private String phone;
 
-    @Size(max = 100, message = "Full name tối đa 100 ký tự")
+    @Size(max = 100, message = "FULL_NAME_TOO_LONG")
     private String fullName;
 
-    @Size(max = 255, message = "Address tối đa 255 ký tự")
+    @Size(max = 255, message = "ADDRESS_TOO_LONG")
     private String address;
 
-    @Size(max = 100, message = "City tối đa 100 ký tự")
+    @Size(max = 100, message = "CITY_TOO_LONG")
     private String city;
 
-    @Size(max = 255, message = "Avatar tối đa 255 ký tự")
+    @Size(max = 255, message = "AVATAR_TOO_LONG")
     private String avatar;
 }

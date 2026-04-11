@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderItemUpdateRequest {
 
-    @Min(value = 1, message = "Quantity phải lớn hơn 0")
+    @Min(value = 1, message = "QUANTITY_INVALID")
     private Integer quantity;
 
     @DecimalMin(value = "0.0", inclusive = false, message = "Price phải lớn hơn 0")

@@ -16,15 +16,15 @@ import jakarta.validation.constraints.NotNull;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartDetailCreateRequest {
 
-    @NotNull(message = "Cart id không được để trống")
-    @Min(value = 1, message = "Cart id phải lớn hơn 0")
+    @NotNull(message = "CART_ID_REQUIRED")
+    @Min(value = 1, message = "CART_ID_INVALID")
     private Long cartId;
 
-    @NotNull(message = "Product detail id không được để trống")
-    @Min(value = 1, message = "Product detail id phải lớn hơn 0")
+    @NotNull(message = "PRODUCT_DETAIL_ID_REQUIRED")
+    @Min(value = 1, message = "PRODUCT_DETAIL_ID_INVALID")
     private Long productDetailId;
 
-    @NotNull(message = "Quantity không được để trống")
-    @Min(value = 1, message = "Quantity phải lớn hơn 0")
+    @NotNull(message = "QUANTITY_REQUIRED")
+    @Min(value = 1, message = "QUANTITY_INVALID")
     private Integer quantity;
 }

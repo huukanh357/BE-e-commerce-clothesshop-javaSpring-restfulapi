@@ -20,18 +20,18 @@ import ClothesShop.spring_restapi_clothesshop.model.ENUM.OrderStatusEnum;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderCreateRequest {
 
-    @NotNull(message = "User id không được để trống")
-    @Min(value = 1, message = "User id phải lớn hơn 0")
+    @NotNull(message = "USER_ID_REQUIRED")
+    @Min(value = 1, message = "USER_ID_INVALID")
     private Long userId;
 
-    @Min(value = 1, message = "Cart id phải lớn hơn 0")
+    @Min(value = 1, message = "CART_ID_INVALID")
     private Long cartId;
 
-    @NotNull(message = "Total amount không được để trống")
+    @NotNull(message = "TOTAL_AMOUNT_REQUIRED")
     @DecimalMin(value = "0.0", inclusive = false, message = "Total amount phải lớn hơn 0")
     private BigDecimal totalAmount;
 
-    @NotNull(message = "Shipping info không được để trống")
+    @NotNull(message = "SHIPPING_INFO_REQUIRED")
     @Valid
     private ShippingInfoRequest shippingInfo;
 

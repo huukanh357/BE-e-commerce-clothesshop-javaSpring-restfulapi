@@ -1,5 +1,6 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import ClothesShop.spring_restapi_clothesshop.exception.AppException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -7,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.permission.PermissionCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.permission.PermissionResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.permission.PermissionUpdateRequest;
-import ClothesShop.spring_restapi_clothesshop.exception.DuplicateResourceException;
-import ClothesShop.spring_restapi_clothesshop.exception.ResourceNotFoundException;
 import ClothesShop.spring_restapi_clothesshop.model.Permission;
 import ClothesShop.spring_restapi_clothesshop.model.ENUM.PermissionMethodENUM;
 import ClothesShop.spring_restapi_clothesshop.repository.PermissionRepository;
@@ -32,7 +31,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public PermissionResponse createPermission(PermissionCreateRequest request) {
         if (permissionRepository.existsByName(request.getName())) {
-            throw new DuplicateResourceException("Permission", "name", request.getName());
+            throw AppException.duplicateResource("Permission", "name", request.getName());
         }
 
         Permission permission = permissionMapper.toEntity(request);
@@ -51,7 +50,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Transactional(readOnly = true)
     public PermissionResponse getPermissionByName(String name) {
         Permission permission = permissionRepository.findByName(name)
-                .orElseThrow(() -> new ResourceNotFoundException("Permission", "name", name));
+                .orElseThrow(() -> AppException.resourceNotFound("Permission", "name", name));
         return permissionMapper.toResponse(permission);
     }
 
@@ -83,7 +82,7 @@ public class PermissionServiceImpl implements PermissionService {
 
         if (request.getName() != null && !request.getName().equals(permission.getName())
                 && permissionRepository.existsByName(request.getName())) {
-            throw new DuplicateResourceException("Permission", "name", request.getName());
+            throw AppException.duplicateResource("Permission", "name", request.getName());
         }
 
         permissionMapper.updateFromRequest(request, permission);
@@ -106,6 +105,6 @@ public class PermissionServiceImpl implements PermissionService {
 
     private Permission findPermissionByIdOrThrow(Long id) {
         return permissionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Permission", "id", id));
+                .orElseThrow(() -> AppException.resourceNotFound("Permission", "id", id));
     }
 }

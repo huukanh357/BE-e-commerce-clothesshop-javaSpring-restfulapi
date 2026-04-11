@@ -6,7 +6,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import ClothesShop.spring_restapi_clothesshop.dto.cartDetail.CartItemResponse;
 import ClothesShop.spring_restapi_clothesshop.model.CartDetail;
-
 import java.math.BigDecimal;
 
 @Mapper(componentModel = "spring")

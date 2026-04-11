@@ -1,5 +1,6 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import ClothesShop.spring_restapi_clothesshop.exception.AppException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -9,9 +10,6 @@ import ClothesShop.spring_restapi_clothesshop.dto.product.ProductFilterRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.product.ProductResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.product.ProductUpdateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.file.FileUploadResponse;
-import ClothesShop.spring_restapi_clothesshop.exception.DuplicateResourceException;
-import ClothesShop.spring_restapi_clothesshop.exception.FileUploadException;
-import ClothesShop.spring_restapi_clothesshop.exception.ResourceNotFoundException;
 import ClothesShop.spring_restapi_clothesshop.model.Category;
 import ClothesShop.spring_restapi_clothesshop.model.Product;
 import ClothesShop.spring_restapi_clothesshop.repository.CategoryRepository;
@@ -30,7 +28,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +49,7 @@ public class ProductServiceImpl implements ProductService {
             "productsByCategoryPage" }, allEntries = true)
     public ProductResponse createProduct(ProductCreateRequest request) {
         if (productRepository.existsByName(request.getName())) {
-            throw new DuplicateResourceException("Product", "name", request.getName());
+            throw AppException.duplicateResource("Product", "name", request.getName());
         }
 
         Product product = productMapper.toEntity(request);
@@ -74,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
     @Cacheable(cacheNames = "productByName", key = "#name")
     public ProductResponse getProductByName(String name) {
         Product product = productRepository.findByName(name)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "name", name));
+                .orElseThrow(() -> AppException.resourceNotFound("Product", "name", name));
         return productMapper.toResponse(product);
     }
 
@@ -112,7 +109,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (request.getName() != null && !request.getName().equals(product.getName())
                 && productRepository.existsByName(request.getName())) {
-            throw new DuplicateResourceException("Product", "name", request.getName());
+            throw AppException.duplicateResource("Product", "name", request.getName());
         }
 
         if (request.getCategoryNames() != null) {
@@ -130,7 +127,7 @@ public class ProductServiceImpl implements ProductService {
             "productsByCategoryPage" }, allEntries = true)
     public ProductResponse uploadProductImages(Long id, List<MultipartFile> files) {
         if (files == null || files.isEmpty()) {
-            throw new FileUploadException("Không có file được cung cấp");
+            throw AppException.fileUploadFailed("Không có file được cung cấp");
         }
 
         Product product = findProductByIdOrThrow(id);
@@ -165,7 +162,7 @@ public class ProductServiceImpl implements ProductService {
 
     private Product findProductByIdOrThrow(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+                .orElseThrow(() -> AppException.resourceNotFound("Product", "id", id));
     }
 
     private List<String> parseImageUrls(String raw) {
@@ -179,7 +176,7 @@ public class ProductServiceImpl implements ProductService {
                 return new ArrayList<>(objectMapper.readValue(trimmed, new TypeReference<List<String>>() {
                 }));
             } catch (JsonProcessingException ex) {
-                throw new FileUploadException("Dữ liệu image_url không hợp lệ");
+                throw AppException.fileUploadFailed("Dữ liệu image_url không hợp lệ");
             }
         }
 
@@ -192,7 +189,7 @@ public class ProductServiceImpl implements ProductService {
         try {
             return objectMapper.writeValueAsString(urls);
         } catch (JsonProcessingException ex) {
-            throw new FileUploadException("Không thể lưu danh sách ảnh sản phẩm");
+            throw AppException.fileUploadFailed("Không thể lưu danh sách ảnh sản phẩm");
         }
     }
 

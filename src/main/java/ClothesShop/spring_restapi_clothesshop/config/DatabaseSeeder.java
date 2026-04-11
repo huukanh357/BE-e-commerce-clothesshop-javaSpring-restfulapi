@@ -341,4 +341,3 @@ public class DatabaseSeeder implements CommandLineRunner {
                                 .orElseThrow(() -> new RuntimeException("Role not found: " + name));
         }
 }
-

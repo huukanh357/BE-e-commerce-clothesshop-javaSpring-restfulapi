@@ -1,5 +1,6 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import ClothesShop.spring_restapi_clothesshop.exception.AppException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -7,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.cartDetail.CartDetailCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.cartDetail.CartDetailResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.cartDetail.CartDetailUpdateRequest;
-import ClothesShop.spring_restapi_clothesshop.exception.DuplicateResourceException;
-import ClothesShop.spring_restapi_clothesshop.exception.ResourceNotFoundException;
 import ClothesShop.spring_restapi_clothesshop.model.Cart;
 import ClothesShop.spring_restapi_clothesshop.model.CartDetail;
 import ClothesShop.spring_restapi_clothesshop.model.ProductDetail;
@@ -37,13 +36,13 @@ public class CartDetailServiceImpl implements CartDetailService {
     @Override
     public CartDetailResponse createCartDetail(CartDetailCreateRequest request) {
         Cart cart = cartRepository.findById(request.getCartId())
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", "id", request.getCartId()));
+                .orElseThrow(() -> AppException.resourceNotFound("Cart", "id", request.getCartId()));
         ProductDetail productDetail = productDetailRepository.findById(request.getProductDetailId())
-                .orElseThrow(() -> new ResourceNotFoundException("ProductDetail", "id", request.getProductDetailId()));
+                .orElseThrow(() -> AppException.resourceNotFound("ProductDetail", "id", request.getProductDetailId()));
 
         if (cartDetailRepository.existsByCart_IdAndProductDetail_Id(request.getCartId(),
                 request.getProductDetailId())) {
-            throw new DuplicateResourceException(
+            throw AppException.duplicateResource(
                     "CartDetail",
                     "cartId-productDetailId",
                     request.getCartId() + "-" + request.getProductDetailId());
@@ -73,7 +72,7 @@ public class CartDetailServiceImpl implements CartDetailService {
     @Transactional(readOnly = true)
     public Page<CartDetailResponse> getCartDetailsByCartId(Long cartId, Pageable pageable) {
         if (!cartRepository.existsById(cartId)) {
-            throw new ResourceNotFoundException("Cart", "id", cartId);
+            throw AppException.resourceNotFound("Cart", "id", cartId);
         }
         return cartDetailRepository.findByCart_Id(cartId, pageable).map(cartDetailMapper::toResponse);
     }
@@ -98,7 +97,7 @@ public class CartDetailServiceImpl implements CartDetailService {
 
     private CartDetail findCartDetailByIdOrThrow(Long id) {
         return cartDetailRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("CartDetail", "id", id));
+                .orElseThrow(() -> AppException.resourceNotFound("CartDetail", "id", id));
     }
 
 }

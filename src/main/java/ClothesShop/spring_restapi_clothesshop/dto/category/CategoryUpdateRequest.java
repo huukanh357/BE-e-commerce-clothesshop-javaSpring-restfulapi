@@ -15,6 +15,6 @@ import jakarta.validation.constraints.Size;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategoryUpdateRequest {
 
-    @Size(max = 100, message = "Name tối đa 100 ký tự")
+    @Size(max = 100, message = "NAME_TOO_LONG_100")
     private String name;
 }

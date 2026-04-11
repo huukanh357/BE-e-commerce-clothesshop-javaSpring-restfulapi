@@ -16,7 +16,7 @@ import jakarta.validation.constraints.Size;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategoryCreateRequest {
 
-    @NotBlank(message = "Name không được để trống")
-    @Size(max = 100, message = "Name tối đa 100 ký tự")
+    @NotBlank(message = "NAME_REQUIRED")
+    @Size(max = 100, message = "NAME_TOO_LONG_100")
     private String name;
 }

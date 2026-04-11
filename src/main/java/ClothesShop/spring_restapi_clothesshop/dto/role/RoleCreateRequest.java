@@ -16,7 +16,7 @@ import jakarta.validation.constraints.Size;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoleCreateRequest {
 
-    @NotBlank(message = "Name không được để trống")
-    @Size(max = 50, message = "Name tối đa 50 ký tự")
+    @NotBlank(message = "NAME_REQUIRED")
+    @Size(max = 50, message = "ROLE_NAME_TOO_LONG")
     private String name;
 }

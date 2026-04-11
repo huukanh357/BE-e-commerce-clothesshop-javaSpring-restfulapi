@@ -1,5 +1,6 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import ClothesShop.spring_restapi_clothesshop.exception.AppException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -7,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.productDetail.ProductDetailCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.productDetail.ProductDetailResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.productDetail.ProductDetailUpdateRequest;
-import ClothesShop.spring_restapi_clothesshop.exception.DuplicateResourceException;
-import ClothesShop.spring_restapi_clothesshop.exception.ResourceNotFoundException;
 import ClothesShop.spring_restapi_clothesshop.model.Product;
 import ClothesShop.spring_restapi_clothesshop.model.ProductDetail;
 import ClothesShop.spring_restapi_clothesshop.repository.ProductDetailRepository;
@@ -34,11 +33,11 @@ public class ProductDetailServiceImpl implements ProductDetailService {
     @Override
     public ProductDetailResponse createProductDetail(ProductDetailCreateRequest request) {
         Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", request.getProductId()));
+                .orElseThrow(() -> AppException.resourceNotFound("Product", "id", request.getProductId()));
 
         if (productDetailRepository.existsByProduct_IdAndSizeAndColor(
                 request.getProductId(), request.getSize(), request.getColor())) {
-            throw new DuplicateResourceException(
+            throw AppException.duplicateResource(
                     "ProductDetail", "productId-size-color",
                     request.getProductId() + "-" + request.getSize() + "-" + request.getColor());
         }
@@ -66,7 +65,7 @@ public class ProductDetailServiceImpl implements ProductDetailService {
     @Transactional(readOnly = true)
     public Page<ProductDetailResponse> getProductDetailsByProductId(Long productId, Pageable pageable) {
         if (!productRepository.existsById(productId)) {
-            throw new ResourceNotFoundException("Product", "id", productId);
+            throw AppException.resourceNotFound("Product", "id", productId);
         }
         return productDetailRepository.findByProduct_Id(productId, pageable).map(productDetailMapper::toResponse);
     }
@@ -81,7 +80,7 @@ public class ProductDetailServiceImpl implements ProductDetailService {
         productDetailRepository.findByProduct_IdAndSizeAndColor(detail.getProduct().getId(), newSize, newColor)
                 .ifPresent(existing -> {
                     if (!existing.getId().equals(detail.getId())) {
-                        throw new DuplicateResourceException(
+                        throw AppException.duplicateResource(
                                 "ProductDetail", "productId-size-color",
                                 detail.getProduct().getId() + "-" + newSize + "-" + newColor);
                     }
@@ -101,6 +100,6 @@ public class ProductDetailServiceImpl implements ProductDetailService {
 
     private ProductDetail findProductDetailByIdOrThrow(Long id) {
         return productDetailRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("ProductDetail", "id", id));
+                .orElseThrow(() -> AppException.resourceNotFound("ProductDetail", "id", id));
     }
 }

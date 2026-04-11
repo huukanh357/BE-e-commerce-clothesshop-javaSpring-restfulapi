@@ -15,6 +15,6 @@ import jakarta.validation.constraints.Size;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoleUpdateRequest {
 
-    @Size(max = 50, message = "Name tối đa 50 ký tự")
+    @Size(max = 50, message = "ROLE_NAME_TOO_LONG")
     private String name;
 }

@@ -19,14 +19,14 @@ import java.math.BigDecimal;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PaymentUserCreateRequest {
 
-    @NotNull(message = "Order id không được để trống")
-    @Min(value = 1, message = "Order id phải lớn hơn 0")
+    @NotNull(message = "ORDER_ID_REQUIRED")
+    @Min(value = 1, message = "ORDER_ID_INVALID")
     private Long orderId;
 
-    @NotNull(message = "Amount không được để trống")
+    @NotNull(message = "AMOUNT_REQUIRED")
     @DecimalMin(value = "0.0", inclusive = false, message = "Amount phải lớn hơn 0")
     private BigDecimal amount;
 
-    @NotNull(message = "Method không được để trống")
+    @NotNull(message = "METHOD_REQUIRED")
     private PaymentMethodEnum method;
 }

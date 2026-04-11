@@ -16,22 +16,22 @@ import jakarta.validation.constraints.Size;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShippingInfoRequest {
 
-    @NotBlank(message = "Receiver name không được để trống")
-    @Size(max = 100, message = "Receiver name tối đa 100 ký tự")
+    @NotBlank(message = "RECEIVER_NAME_REQUIRED")
+    @Size(max = 100, message = "RECEIVER_NAME_TOO_LONG")
     private String receiverName;
 
-    @NotBlank(message = "Receiver phone không được để trống")
-    @Size(max = 20, message = "Receiver phone tối đa 20 ký tự")
+    @NotBlank(message = "RECEIVER_PHONE_REQUIRED")
+    @Size(max = 20, message = "RECEIVER_PHONE_TOO_LONG")
     private String receiverPhone;
 
-    @NotBlank(message = "Shipping address không được để trống")
-    @Size(max = 255, message = "Shipping address tối đa 255 ký tự")
+    @NotBlank(message = "SHIPPING_ADDRESS_REQUIRED")
+    @Size(max = 255, message = "SHIPPING_ADDRESS_TOO_LONG")
     private String shippingAddress;
 
-    @NotBlank(message = "Shipping city không được để trống")
-    @Size(max = 100, message = "Shipping city tối đa 100 ký tự")
+    @NotBlank(message = "SHIPPING_CITY_REQUIRED")
+    @Size(max = 100, message = "SHIPPING_CITY_TOO_LONG")
     private String shippingCity;
 
-    @Size(max = 500, message = "Shipping note tối đa 500 ký tự")
+    @Size(max = 500, message = "SHIPPING_NOTE_TOO_LONG")
     private String shippingNote;
 }

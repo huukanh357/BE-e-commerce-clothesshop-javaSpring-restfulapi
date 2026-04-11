@@ -19,14 +19,14 @@ import java.math.BigDecimal;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderUserCreateRequest {
 
-    @Min(value = 1, message = "Cart id phải lớn hơn 0")
+    @Min(value = 1, message = "CART_ID_INVALID")
     private Long cartId;
 
-    @NotNull(message = "Total amount không được để trống")
+    @NotNull(message = "TOTAL_AMOUNT_REQUIRED")
     @DecimalMin(value = "0.0", inclusive = false, message = "Total amount phải lớn hơn 0")
     private BigDecimal totalAmount;
 
-    @NotNull(message = "Shipping info không được để trống")
+    @NotNull(message = "SHIPPING_INFO_REQUIRED")
     @Valid
     private ShippingInfoRequest shippingInfo;
 }

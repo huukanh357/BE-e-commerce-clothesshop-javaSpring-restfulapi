@@ -18,7 +18,7 @@ import ClothesShop.spring_restapi_clothesshop.model.ENUM.OrderStatusEnum;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderUpdateRequest {
 
-    @Min(value = 1, message = "Cart id phải lớn hơn 0")
+    @Min(value = 1, message = "CART_ID_INVALID")
     private Long cartId;
 
     @DecimalMin(value = "0.0", inclusive = false, message = "Total amount phải lớn hơn 0")

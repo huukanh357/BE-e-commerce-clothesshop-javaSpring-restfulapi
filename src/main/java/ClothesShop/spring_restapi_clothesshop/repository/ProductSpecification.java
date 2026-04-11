@@ -2,7 +2,6 @@ package ClothesShop.spring_restapi_clothesshop.repository;
 
 import ClothesShop.spring_restapi_clothesshop.model.Product;
 import org.springframework.data.jpa.domain.Specification;
-
 import java.math.BigDecimal;
 import java.util.List;
 

@@ -18,18 +18,18 @@ import jakarta.validation.constraints.Size;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductDetailCreateRequest {
 
-    @NotNull(message = "Product id không được để trống")
-    @Min(value = 1, message = "Product id phải lớn hơn 0")
+    @NotNull(message = "PRODUCT_ID_REQUIRED")
+    @Min(value = 1, message = "PRODUCT_ID_INVALID")
     private Long productId;
 
-    @NotBlank(message = "Size không được để trống")
-    @Size(max = 20, message = "Size tối đa 20 ký tự")
+    @NotBlank(message = "SIZE_REQUIRED")
+    @Size(max = 20, message = "SIZE_TOO_LONG")
     private String size;
 
-    @Size(max = 50, message = "Color tối đa 50 ký tự")
+    @Size(max = 50, message = "COLOR_TOO_LONG")
     private String color;
 
-    @NotNull(message = "Stock quantity không được để trống")
-    @Min(value = 0, message = "Stock quantity không được âm")
+    @NotNull(message = "STOCK_QUANTITY_REQUIRED")
+    @Min(value = 0, message = "STOCK_QUANTITY_INVALID")
     private Integer stockQuantity;
 }

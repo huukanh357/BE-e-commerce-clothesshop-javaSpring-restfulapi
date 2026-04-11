@@ -1,5 +1,6 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import ClothesShop.spring_restapi_clothesshop.exception.AppException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -7,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.role.RoleCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.role.RoleResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.role.RoleUpdateRequest;
-import ClothesShop.spring_restapi_clothesshop.exception.DuplicateResourceException;
-import ClothesShop.spring_restapi_clothesshop.exception.ResourceNotFoundException;
 import ClothesShop.spring_restapi_clothesshop.model.Role;
 import ClothesShop.spring_restapi_clothesshop.repository.RoleRepository;
 import ClothesShop.spring_restapi_clothesshop.service.RoleService;
@@ -31,7 +30,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleResponse createRole(RoleCreateRequest request) {
         if (roleRepository.existsByName(request.getName())) {
-            throw new DuplicateResourceException("Role", "name", request.getName());
+            throw AppException.duplicateResource("Role", "name", request.getName());
         }
 
         Role role = roleMapper.toEntity(request);
@@ -50,7 +49,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(readOnly = true)
     public RoleResponse getRoleByName(String name) {
         Role role = roleRepository.findByName(name)
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", name));
+                .orElseThrow(() -> AppException.resourceNotFound("Role", "name", name));
         return roleMapper.toResponse(role);
     }
 
@@ -66,7 +65,7 @@ public class RoleServiceImpl implements RoleService {
 
         if (request.getName() != null && !request.getName().equals(role.getName())
                 && roleRepository.existsByName(request.getName())) {
-            throw new DuplicateResourceException("Role", "name", request.getName());
+            throw AppException.duplicateResource("Role", "name", request.getName());
         }
 
         if (request.getName() != null) {
@@ -91,6 +90,6 @@ public class RoleServiceImpl implements RoleService {
 
     private Role findRoleByIdOrThrow(Long id) {
         return roleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "id", id));
+                .orElseThrow(() -> AppException.resourceNotFound("Role", "id", id));
     }
 }

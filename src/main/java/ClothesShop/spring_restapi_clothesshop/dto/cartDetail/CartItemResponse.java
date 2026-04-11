@@ -11,6 +11,7 @@ import ClothesShop.spring_restapi_clothesshop.model.Product;
 import ClothesShop.spring_restapi_clothesshop.model.ProductDetail;
 import java.math.BigDecimal;
 import java.time.Instant;
+
 @Data
 @Builder
 @NoArgsConstructor

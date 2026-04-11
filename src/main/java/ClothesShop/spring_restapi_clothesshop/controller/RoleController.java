@@ -82,4 +82,3 @@ public class RoleController {
                 .ok(ApiResponse.success(exists ? "Role name already exists" : "Role name available", exists));
     }
 }
-

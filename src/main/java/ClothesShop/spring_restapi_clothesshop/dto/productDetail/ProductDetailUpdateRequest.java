@@ -16,12 +16,12 @@ import jakarta.validation.constraints.Size;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductDetailUpdateRequest {
 
-    @Size(max = 20, message = "Size tối đa 20 ký tự")
+    @Size(max = 20, message = "SIZE_TOO_LONG")
     private String size;
 
-    @Size(max = 50, message = "Color tối đa 50 ký tự")
+    @Size(max = 50, message = "COLOR_TOO_LONG")
     private String color;
 
-    @Min(value = 0, message = "Stock quantity không được âm")
+    @Min(value = 0, message = "STOCK_QUANTITY_INVALID")
     private Integer stockQuantity;
 }

@@ -13,7 +13,6 @@ import ClothesShop.spring_restapi_clothesshop.dto.product.ProductResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.product.ProductUpdateRequest;
 import ClothesShop.spring_restapi_clothesshop.model.Category;
 import ClothesShop.spring_restapi_clothesshop.model.Product;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -20,9 +20,9 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductUpdateRequest {
 
-    private List<@NotBlank(message = "Category name không được để trống") @Size(max = 100, message = "Category name tối đa 100 ký tự") String> categoryNames;
+    private List<@NotBlank(message = "CATEGORY_NAME_REQUIRED") @Size(max = 100, message = "CATEGORY_NAME_TOO_LONG") String> categoryNames;
 
-    @Size(max = 255, message = "Name tối đa 255 ký tự")
+    @Size(max = 255, message = "NAME_TOO_LONG_255")
     private String name;
 
     private String description;
@@ -30,9 +30,9 @@ public class ProductUpdateRequest {
     @DecimalMin(value = "0.0", inclusive = false, message = "Price phải lớn hơn 0")
     private BigDecimal price;
 
-    @Min(value = 0, message = "Stock quantity không được âm")
+    @Min(value = 0, message = "STOCK_QUANTITY_INVALID")
     private Integer stockQuantity;
 
-    @Size(max = 255, message = "Image url tối đa 255 ký tự")
+    @Size(max = 255, message = "IMAGE_URL_TOO_LONG")
     private String imageUrl;
 }

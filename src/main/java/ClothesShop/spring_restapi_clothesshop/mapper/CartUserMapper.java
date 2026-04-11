@@ -5,7 +5,6 @@ import org.mapstruct.Mapping;
 import ClothesShop.spring_restapi_clothesshop.dto.cart.CartUserResponse;
 import ClothesShop.spring_restapi_clothesshop.model.Cart;
 import ClothesShop.spring_restapi_clothesshop.model.CartDetail;
-
 import java.util.ArrayList;
 import java.util.List;
 

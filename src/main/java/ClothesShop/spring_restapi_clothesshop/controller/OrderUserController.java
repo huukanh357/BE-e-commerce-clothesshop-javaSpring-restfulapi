@@ -67,4 +67,3 @@ public class OrderUserController {
         return userId.longValue();
     }
 }
-

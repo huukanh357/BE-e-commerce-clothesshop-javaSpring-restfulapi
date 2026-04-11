@@ -68,4 +68,3 @@ public class PaymentUserController {
         return userId.longValue();
     }
 }
-

@@ -33,4 +33,3 @@ public class FileController {
                 .body(ApiResponse.created("File uploaded", response));
     }
 }
-

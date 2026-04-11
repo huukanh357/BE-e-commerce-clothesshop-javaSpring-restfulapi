@@ -1,7 +1,6 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
-import ClothesShop.spring_restapi_clothesshop.exception.DuplicateResourceException;
-import ClothesShop.spring_restapi_clothesshop.exception.ResourceNotFoundException;
+import ClothesShop.spring_restapi_clothesshop.exception.AppException;
 import ClothesShop.spring_restapi_clothesshop.dto.user.UserResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.user.UserCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.user.UserUpdateRequest;
@@ -17,7 +16,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,18 +39,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse createUser(UserCreateRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new DuplicateResourceException("User", "username", request.getUsername());
+            throw AppException.duplicateResource("User", "username", request.getUsername());
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("User", "email", request.getEmail());
+            throw AppException.duplicateResource("User", "email", request.getEmail());
         }
 
         User user = userMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         Role defaultRole = roleRepository.findById(2L)
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "id", 2L));
+                .orElseThrow(() -> AppException.resourceNotFound("Role", "id", 2L));
         user.setRole(defaultRole);
 
         User savedUser = userRepository.save(user);
@@ -70,7 +68,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponse getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+                .orElseThrow(() -> AppException.resourceNotFound("User", "username", username));
         return userMapper.toResponse(user);
     }
 
@@ -78,7 +76,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponse getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+                .orElseThrow(() -> AppException.resourceNotFound("User", "email", email));
         return userMapper.toResponse(user);
     }
 
@@ -96,7 +94,7 @@ public class UserServiceImpl implements UserService {
 
         if (request.getRoleId() != null) {
             Role role = roleRepository.findById(request.getRoleId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Role", "id", request.getRoleId()));
+                    .orElseThrow(() -> AppException.resourceNotFound("Role", "id", request.getRoleId()));
             user.setRole(role);
         }
 
@@ -134,6 +132,6 @@ public class UserServiceImpl implements UserService {
 
     private User findUserByIdOrThrow(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+                .orElseThrow(() -> AppException.resourceNotFound("User", "id", id));
     }
 }

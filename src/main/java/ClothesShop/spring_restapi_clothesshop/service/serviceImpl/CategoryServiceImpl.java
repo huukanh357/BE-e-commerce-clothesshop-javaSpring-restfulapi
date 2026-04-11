@@ -1,5 +1,6 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import ClothesShop.spring_restapi_clothesshop.exception.AppException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -7,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import ClothesShop.spring_restapi_clothesshop.dto.category.CategoryCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.category.CategoryResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.category.CategoryUpdateRequest;
-import ClothesShop.spring_restapi_clothesshop.exception.DuplicateResourceException;
-import ClothesShop.spring_restapi_clothesshop.exception.ResourceNotFoundException;
 import ClothesShop.spring_restapi_clothesshop.model.Category;
 import ClothesShop.spring_restapi_clothesshop.repository.CategoryRepository;
 import ClothesShop.spring_restapi_clothesshop.service.CategoryService;
@@ -34,7 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
     @CacheEvict(cacheNames = { "categoryById", "categoryByName", "categoriesPage" }, allEntries = true)
     public CategoryResponse createCategory(CategoryCreateRequest request) {
         if (categoryRepository.existsByName(request.getName())) {
-            throw new DuplicateResourceException("Category", "name", request.getName());
+            throw AppException.duplicateResource("Category", "name", request.getName());
         }
 
         Category category = categoryMapper.toEntity(request);
@@ -56,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Cacheable(cacheNames = "categoryByName", key = "#name")
     public CategoryResponse getCategoryByName(String name) {
         Category category = categoryRepository.findByName(name)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "name", name));
+                .orElseThrow(() -> AppException.resourceNotFound("Category", "name", name));
         return categoryMapper.toResponse(category);
     }
 
@@ -75,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (request.getName() != null) {
             String newName = request.getName().trim();
             if (!newName.isEmpty() && !newName.equals(category.getName()) && categoryRepository.existsByName(newName)) {
-                throw new DuplicateResourceException("Category", "name", newName);
+                throw AppException.duplicateResource("Category", "name", newName);
             }
             if (!newName.isEmpty()) {
                 categoryMapper.updateFromRequest(request, category);
@@ -101,6 +100,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     private Category findCategoryByIdOrThrow(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
+                .orElseThrow(() -> AppException.resourceNotFound("Category", "id", id));
     }
 }

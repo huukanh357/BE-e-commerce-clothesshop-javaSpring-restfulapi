@@ -1,5 +1,6 @@
 package ClothesShop.spring_restapi_clothesshop.service.serviceImpl;
 
+import ClothesShop.spring_restapi_clothesshop.exception.AppException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -8,8 +9,6 @@ import ClothesShop.spring_restapi_clothesshop.dto.payment.PaymentCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.payment.PaymentResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.payment.PaymentUpdateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.payment.PaymentUserCreateRequest;
-import ClothesShop.spring_restapi_clothesshop.exception.DuplicateResourceException;
-import ClothesShop.spring_restapi_clothesshop.exception.ResourceNotFoundException;
 import ClothesShop.spring_restapi_clothesshop.model.Order;
 import ClothesShop.spring_restapi_clothesshop.model.Payment;
 import ClothesShop.spring_restapi_clothesshop.model.User;
@@ -39,12 +38,12 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResponse createPayment(PaymentCreateRequest request) {
         Order order = orderRepository.findById(request.getOrderId())
-                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", request.getOrderId()));
+                .orElseThrow(() -> AppException.resourceNotFound("Order", "id", request.getOrderId()));
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", request.getUserId()));
+                .orElseThrow(() -> AppException.resourceNotFound("User", "id", request.getUserId()));
 
         if (paymentRepository.existsByOrder_Id(request.getOrderId())) {
-            throw new DuplicateResourceException("Payment", "orderId", request.getOrderId());
+            throw AppException.duplicateResource("Payment", "orderId", request.getOrderId());
         }
 
         Payment payment = paymentMapper.toEntity(request);
@@ -68,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional(readOnly = true)
     public PaymentResponse getPaymentByOrderId(Long orderId) {
         Payment payment = paymentRepository.findByOrder_Id(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Payment", "orderId", orderId));
+                .orElseThrow(() -> AppException.resourceNotFound("Payment", "orderId", orderId));
         return paymentMapper.toResponse(payment);
     }
 
@@ -76,7 +75,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional(readOnly = true)
     public Page<PaymentResponse> getPaymentsByUserId(Long userId, Pageable pageable) {
         if (!userRepository.existsById(userId)) {
-            throw new ResourceNotFoundException("User", "id", userId);
+            throw AppException.resourceNotFound("User", "id", userId);
         }
         return paymentRepository.findByUser_Id(userId, pageable).map(paymentMapper::toResponse);
     }
@@ -121,7 +120,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional(readOnly = true)
     public Page<PaymentResponse> getMyPayments(Long userId, Pageable pageable) {
         if (!userRepository.existsById(userId)) {
-            throw new ResourceNotFoundException("User", "id", userId);
+            throw AppException.resourceNotFound("User", "id", userId);
         }
         return paymentRepository.findByUser_Id(userId, pageable).map(paymentMapper::toResponse);
     }
@@ -131,7 +130,7 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentResponse getMyPaymentById(Long userId, Long paymentId) {
         Payment payment = findPaymentByIdOrThrow(paymentId);
         if (!payment.getUser().getId().equals(userId)) {
-            throw new ResourceNotFoundException("Payment", "id", paymentId);
+            throw AppException.resourceNotFound("Payment", "id", paymentId);
         }
         return paymentMapper.toResponse(payment);
     }
@@ -139,16 +138,16 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResponse createMyPayment(Long userId, PaymentUserCreateRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+                .orElseThrow(() -> AppException.resourceNotFound("User", "id", userId));
         Order order = orderRepository.findById(request.getOrderId())
-                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", request.getOrderId()));
+                .orElseThrow(() -> AppException.resourceNotFound("Order", "id", request.getOrderId()));
 
         if (!order.getUser().getId().equals(userId)) {
-            throw new ResourceNotFoundException("Order", "id", request.getOrderId());
+            throw AppException.resourceNotFound("Order", "id", request.getOrderId());
         }
 
         if (paymentRepository.existsByOrder_Id(request.getOrderId())) {
-            throw new DuplicateResourceException("Payment", "orderId", request.getOrderId());
+            throw AppException.duplicateResource("Payment", "orderId", request.getOrderId());
         }
 
         Payment payment = new Payment();
@@ -164,7 +163,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private Payment findPaymentByIdOrThrow(Long id) {
         return paymentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Payment", "id", id));
+                .orElseThrow(() -> AppException.resourceNotFound("Payment", "id", id));
     }
 
 }

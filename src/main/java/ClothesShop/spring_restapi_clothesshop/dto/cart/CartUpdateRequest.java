@@ -15,6 +15,6 @@ import jakarta.validation.constraints.Min;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartUpdateRequest {
 
-    @Min(value = 1, message = "User id phải lớn hơn 0")
+    @Min(value = 1, message = "USER_ID_INVALID")
     private Long userId;
 }

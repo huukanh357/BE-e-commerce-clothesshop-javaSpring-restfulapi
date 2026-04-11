@@ -1,5 +1,6 @@
 package ClothesShop.spring_restapi_clothesshop.auth;
 
+import ClothesShop.spring_restapi_clothesshop.exception.AppException;
 import ClothesShop.spring_restapi_clothesshop.auth.dto.ChangePasswordRequest;
 import ClothesShop.spring_restapi_clothesshop.auth.dto.LoginRequest;
 import ClothesShop.spring_restapi_clothesshop.auth.dto.LoginResponse;
@@ -8,9 +9,6 @@ import ClothesShop.spring_restapi_clothesshop.auth.dto.RegisterResponse;
 import ClothesShop.spring_restapi_clothesshop.auth.dto.UpdateMeRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.file.FileUploadResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.user.UserResponse;
-import ClothesShop.spring_restapi_clothesshop.exception.DuplicateResourceException;
-import ClothesShop.spring_restapi_clothesshop.exception.InvalidTokenException;
-import ClothesShop.spring_restapi_clothesshop.exception.ResourceNotFoundException;
 import ClothesShop.spring_restapi_clothesshop.model.Cart;
 import ClothesShop.spring_restapi_clothesshop.model.RefreshToken;
 import ClothesShop.spring_restapi_clothesshop.model.Role;
@@ -89,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", request.email()));
+                .orElseThrow(() -> AppException.resourceNotFound("User", "email", request.email()));
 
         String rawAccessToken = generateAccessToken(authentication, user.getId());
         String rawRefreshToken = generateRefreshToken(user.getId(), user.getEmail());
@@ -104,15 +102,15 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
-            throw new DuplicateResourceException("User", "username", request.username());
+            throw AppException.duplicateResource("User", "username", request.username());
         }
 
         if (userRepository.existsByEmail(request.email())) {
-            throw new DuplicateResourceException("User", "email", request.email());
+            throw AppException.duplicateResource("User", "email", request.email());
         }
 
         Role defaultRole = roleRepository.findByName("USER")
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", "USER"));
+                .orElseThrow(() -> AppException.resourceNotFound("Role", "name", "USER"));
 
         User user = new User();
         user.setUsername(request.username());
@@ -141,14 +139,14 @@ public class AuthServiceImpl implements AuthService {
         String tokenHash = hashToken(rawRefreshToken);
 
         RefreshToken storedToken = refreshTokenRepository.findByToken(tokenHash)
-                .orElseThrow(() -> new InvalidTokenException("Refresh token không hợp lệ"));
+                .orElseThrow(() -> AppException.invalidToken("Refresh token không hợp lệ"));
 
         if (storedToken.isRevoked()) {
-            throw new InvalidTokenException("Refresh token đã bị thu hồi");
+            throw AppException.invalidToken("Refresh token đã bị thu hồi");
         }
 
         if (storedToken.getExpiresAt().isBefore(Instant.now())) {
-            throw new InvalidTokenException("Refresh token đã hết hạn");
+            throw AppException.invalidToken("Refresh token đã hết hạn");
         }
 
         storedToken.setRevoked(true);
@@ -172,7 +170,7 @@ public class AuthServiceImpl implements AuthService {
         String tokenHash = hashToken(rawRefreshToken);
 
         RefreshToken storedToken = refreshTokenRepository.findByToken(tokenHash)
-                .orElseThrow(() -> new InvalidTokenException("Refresh token không hợp lệ"));
+                .orElseThrow(() -> AppException.invalidToken("Refresh token không hợp lệ"));
 
         storedToken.setRevoked(true);
         refreshTokenRepository.save(storedToken);
@@ -183,7 +181,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(readOnly = true)
     public UserResponse getMe(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+                .orElseThrow(() -> AppException.resourceNotFound("User", "email", email));
         return UserResponse.fromEntity(user);
     }
 
@@ -191,7 +189,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public UserResponse updateMe(String email, UpdateMeRequest request) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+                .orElseThrow(() -> AppException.resourceNotFound("User", "email", email));
 
         if (request.phone() != null) {
             user.setPhone(request.phone());
@@ -217,7 +215,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public UserResponse uploadMyAvatar(String email, MultipartFile file) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+                .orElseThrow(() -> AppException.resourceNotFound("User", "email", email));
 
         FileUploadResponse uploaded = fileService.upload(file, "avatars");
         user.setAvatar(uploaded.getFileUrl());
@@ -234,7 +232,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+                .orElseThrow(() -> AppException.resourceNotFound("User", "email", email));
 
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Mật khẩu hiện tại không đúng");
@@ -319,4 +317,3 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 }
-

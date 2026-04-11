@@ -1,5 +1,6 @@
 package ClothesShop.spring_restapi_clothesshop.controller;
 
+import ClothesShop.spring_restapi_clothesshop.exception.AppException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -14,7 +15,6 @@ import ClothesShop.spring_restapi_clothesshop.auth.dto.RegisterResponse;
 import ClothesShop.spring_restapi_clothesshop.auth.dto.UpdateMeRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.ApiResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.user.UserResponse;
-import ClothesShop.spring_restapi_clothesshop.exception.InvalidTokenException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -78,7 +78,7 @@ public class AuthController {
 
         String rawRefreshToken = extractRefreshToken(body, httpRequest);
         if (rawRefreshToken == null) {
-            throw new InvalidTokenException("Refresh token khong duoc cung cap");
+            throw AppException.invalidToken("Refresh token khong duoc cung cap");
         }
 
         LoginResponse loginResponse = authService.refresh(rawRefreshToken);
@@ -176,4 +176,3 @@ public class AuthController {
         return request.getRemoteAddr();
     }
 }
-

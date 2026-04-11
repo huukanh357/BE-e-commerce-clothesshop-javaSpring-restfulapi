@@ -1,6 +1,7 @@
 package ClothesShop.spring_restapi_clothesshop.config;
 
 import ClothesShop.spring_restapi_clothesshop.dto.ApiResponse;
+import ClothesShop.spring_restapi_clothesshop.exception.ErrorCode;
 import ClothesShop.spring_restapi_clothesshop.security.PermissionAuthorizationManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
@@ -92,7 +93,7 @@ public class SecurityConfig {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding("UTF-8");
 
-            ApiResponse<Void> body = ApiResponse.unauthorized("Token không hợp lệ hoặc đã hết hạn");
+            ApiResponse<Void> body = ApiResponse.ofError(ErrorCode.AUTH_INVALID_TOKEN);
             ObjectMapper mapper = new ObjectMapper();
             response.getWriter().write(mapper.writeValueAsString(body));
         };
@@ -105,7 +106,7 @@ public class SecurityConfig {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding("UTF-8");
 
-            ApiResponse<Void> body = ApiResponse.forbidden("Bạn không có quyền truy cập tài nguyên này");
+            ApiResponse<Void> body = ApiResponse.ofError(ErrorCode.ACCESS_DENIED);
             ObjectMapper mapper = new ObjectMapper();
             response.getWriter().write(mapper.writeValueAsString(body));
         };

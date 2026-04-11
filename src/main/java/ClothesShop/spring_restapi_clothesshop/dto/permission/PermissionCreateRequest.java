@@ -18,18 +18,18 @@ import jakarta.validation.constraints.Size;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PermissionCreateRequest {
 
-    @NotBlank(message = "Name không được để trống")
-    @Size(max = 100, message = "Name tối đa 100 ký tự")
+    @NotBlank(message = "NAME_REQUIRED")
+    @Size(max = 100, message = "NAME_TOO_LONG_100")
     private String name;
 
-    @NotBlank(message = "Api path không được để trống")
-    @Size(max = 255, message = "Api path tối đa 255 ký tự")
+    @NotBlank(message = "API_PATH_REQUIRED")
+    @Size(max = 255, message = "API_PATH_TOO_LONG")
     private String apiPath;
 
-    @NotNull(message = "Method không được để trống")
+    @NotNull(message = "METHOD_REQUIRED")
     private PermissionMethodENUM method;
 
-    @NotBlank(message = "Module không được để trống")
-    @Size(max = 100, message = "Module tối đa 100 ký tự")
+    @NotBlank(message = "MODULE_REQUIRED")
+    @Size(max = 100, message = "MODULE_TOO_LONG")
     private String module;
 }

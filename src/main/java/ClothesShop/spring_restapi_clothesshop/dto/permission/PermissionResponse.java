@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import ClothesShop.spring_restapi_clothesshop.model.Permission;
 import ClothesShop.spring_restapi_clothesshop.model.ENUM.PermissionMethodENUM;
+
 @Data
 @Builder
 @NoArgsConstructor

@@ -5,7 +5,6 @@ import ClothesShop.spring_restapi_clothesshop.dto.order.OrderResponse;
 import ClothesShop.spring_restapi_clothesshop.dto.order.OrderUserCreateRequest;
 import ClothesShop.spring_restapi_clothesshop.dto.order.OrderUpdateRequest;
 import ClothesShop.spring_restapi_clothesshop.model.ENUM.OrderStatusEnum;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -30,4 +29,3 @@ public interface OrderService {
 
     OrderResponse createMyOrder(Long userId, OrderUserCreateRequest request);
 }
-

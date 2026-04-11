@@ -2,7 +2,6 @@ package ClothesShop.spring_restapi_clothesshop.repository;
 
 import ClothesShop.spring_restapi_clothesshop.model.Permission;
 import ClothesShop.spring_restapi_clothesshop.model.ENUM.PermissionMethodENUM;
-
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

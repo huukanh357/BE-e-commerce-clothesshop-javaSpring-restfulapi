@@ -23,21 +23,21 @@ import jakarta.validation.constraints.Size;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
 
-    @Pattern(regexp = "^(|[0-9+\\-\\s]{8,20})$", message = "Số điện thoại không hợp lệ")
+    @Pattern(regexp = "^(|[0-9+\\-\\s]{8,20})$", message = "PHONE_INVALID")
     private String phone;
 
-    @Size(max = 100, message = "Full name tối đa 100 ký tự")
+    @Size(max = 100, message = "FULL_NAME_TOO_LONG")
     private String fullName;
 
-    @Size(max = 255, message = "Address tối đa 255 ký tự")
+    @Size(max = 255, message = "ADDRESS_TOO_LONG")
     private String address;
 
-    @Size(max = 100, message = "City tối đa 100 ký tự")
+    @Size(max = 100, message = "CITY_TOO_LONG")
     private String city;
 
-    @Size(max = 255, message = "Avatar tối đa 255 ký tự")
+    @Size(max = 255, message = "AVATAR_TOO_LONG")
     private String avatar;
 
-    @Positive(message = "Role Id phải lớn hơn 0")
+    @Positive(message = "ROLE_ID_INVALID")
     private Long roleId;
 }
